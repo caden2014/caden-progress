@@ -9,8 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
     <!-- Tailwind CSS Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Free in-browser OCR engine for calendar screenshots (no API key / no billing) -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     
     <style>
         body {
@@ -168,7 +166,7 @@
                     <span class="material-icons text-base">menu_book</span> Money Guides
                 </button>
                 <button onclick="switchTab('calendar')" id="btn-calendar" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
-                    <span class="material-icons text-base">event_note</span> Calendar Import
+                    <span class="material-icons text-base">edit_calendar</span> Schedule Editor
                 </button>
                 <button onclick="switchTab('print')" id="btn-print" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
                     <span class="material-icons text-base">print</span> Printable Wall Chart
@@ -744,15 +742,15 @@
         </div>
 
 
-        <!-- Tab 7: Calendar Screenshot Import & Editor -->
+        <!-- Tab 7: Simple Schedule Editor -->
         <div id="tab-calendar" class="tab-content hidden space-y-6">
             <section class="glass-card rounded-3xl p-4 md:p-6 shadow-xl space-y-5">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-slate-800 pb-4">
                     <div>
                         <h2 class="text-base md:text-lg font-bold text-cyan-400 flex items-center gap-2">
-                            <span class="material-icons">event_note</span> Calendar Screenshot Import
+                            <span class="material-icons">edit_calendar</span> Simple Schedule Editor
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">Free in-browser OCR reads your screenshot. Review/edit before saving. Opponents stay hidden by default.</p>
+                        <p class="text-xs text-slate-400 mt-1">No OCR, no AI, no uploads. Keep the default schedule and manually edit, add, or delete anything that is off.</p>
                     </div>
                     <div class="flex items-center gap-2 bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2">
                         <input type="checkbox" id="hide-opponents-toggle" class="hub-checkbox w-6 h-6" checked onchange="toggleHideOpponents()">
@@ -760,186 +758,67 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                    <div class="space-y-4">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <div class="lg:col-span-1 space-y-4">
                         <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 space-y-3">
-                            <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest">1. Upload screenshot</h3>
-                            <input id="calendar-screenshot-input" type="file" accept="image/*" onchange="handleCalendarScreenshotUpload(event)" class="block w-full text-xs text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
-                            <img id="calendar-screenshot-preview" class="hidden max-h-72 w-full object-contain rounded-xl border border-slate-800 bg-slate-950" alt="Calendar screenshot preview">
-                            <button onclick="runCalendarOCR()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
-                                <span class="material-icons text-base">document_scanner</span> Read Screenshot in App
+                            <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest">Add an event</h3>
+                            <select id="manual-event-week" class="w-full rounded-xl bg-slate-900/80 border border-slate-800 text-slate-100 text-xs px-3 py-2 focus:outline-none focus:border-indigo-500">
+                                <option value="1">Week 1</option>
+                                <option value="2">Week 2</option>
+                                <option value="3">Week 3</option>
+                                <option value="4">Week 4</option>
+                            </select>
+                            <select id="manual-event-day" class="w-full rounded-xl bg-slate-900/80 border border-slate-800 text-slate-100 text-xs px-3 py-2 focus:outline-none focus:border-indigo-500">
+                                <option value="0">Monday</option>
+                                <option value="1">Tuesday</option>
+                                <option value="2">Wednesday</option>
+                                <option value="3">Thursday</option>
+                                <option value="4">Friday</option>
+                                <option value="5">Saturday</option>
+                                <option value="6">Sunday</option>
+                            </select>
+                            <input id="manual-event-time" value="07:00 PM" class="w-full rounded-xl bg-slate-900/80 border border-slate-800 text-slate-100 text-xs px-3 py-2 focus:outline-none focus:border-indigo-500" placeholder="Time, e.g. 07:00 PM">
+                            <select id="manual-event-type" class="w-full rounded-xl bg-slate-900/80 border border-slate-800 text-slate-100 text-xs px-3 py-2 focus:outline-none focus:border-indigo-500" onchange="prefillManualEventTask()">
+                                <option value="game">Game</option>
+                                <option value="practice">Practice</option>
+                                <option value="personal">Personal</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <input id="manual-event-task" value="⚽ GAME DAY - Opponent Hidden" class="w-full rounded-xl bg-slate-900/80 border border-slate-800 text-slate-100 text-xs px-3 py-2 focus:outline-none focus:border-indigo-500" placeholder="Task label">
+                            <input id="manual-event-opponent" class="w-full rounded-xl bg-slate-900/80 border border-slate-800 text-slate-100 text-xs px-3 py-2 focus:outline-none focus:border-indigo-500" placeholder="Opponent (optional, hidden in routine view)">
+                            <button onclick="addManualCalendarEvent()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
+                                <span class="material-icons text-base">add</span> Add Event
                             </button>
-                            <p id="calendar-ocr-status" class="text-xs text-slate-400">No screenshot selected yet.</p>
                         </div>
 
                         <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 space-y-3">
-                            <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest">2. OCR text</h3>
-                            <textarea id="calendar-ocr-text" rows="9" placeholder="OCR text will appear here. You can also paste schedule text manually." class="w-full rounded-xl bg-slate-900/80 border border-slate-800 text-slate-100 placeholder-slate-500 text-xs p-3 focus:outline-none focus:border-indigo-500"></textarea>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                <label class="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2 cursor-pointer">
-                                    <input type="checkbox" id="apply-all-weeks-toggle" class="hub-checkbox w-6 h-6" checked>
-                                    Apply detected events to all 4 weeks
-                                </label>
-                                <select id="calendar-import-week-select" class="rounded-xl bg-slate-900/80 border border-slate-800 text-slate-100 text-xs px-3 py-2 focus:outline-none focus:border-indigo-500">
-                                    <option value="1">Selected Week: Week 1</option>
-                                    <option value="2">Selected Week: Week 2</option>
-                                    <option value="3">Selected Week: Week 3</option>
-                                    <option value="4">Selected Week: Week 4</option>
-                                </select>
-                            </div>
-                            <button onclick="parseCalendarOCRText()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
-                                <span class="material-icons text-base">auto_fix_high</span> Detect Events
+                            <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest">Save or reset</h3>
+                            <button onclick="saveImportedCalendarSchedule()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
+                                <span class="material-icons text-base">save</span> Save Schedule Edits
                             </button>
+                            <button onclick="resetCalendarDraftToDefault()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
+                                <span class="material-icons text-base">restart_alt</span> Reload Default Into Editor
+                            </button>
+                            <button onclick="clearImportedCalendarSchedule()" class="w-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
+                                <span class="material-icons text-base">delete</span> Clear Saved Edits
+                            </button>
+                            <p id="calendar-save-status" class="text-xs text-slate-400">Default schedule is active unless you save edits.</p>
                         </div>
                     </div>
 
-                    <div class="space-y-4">
-                        <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 space-y-3">
-                            <div class="flex items-center justify-between gap-3">
-                                <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest">3. Review & edit</h3>
-                                <button onclick="addManualCalendarEvent()" class="text-xs px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold flex items-center gap-1">
-                                    <span class="material-icons text-sm">add</span> Add Event
-                                </button>
-                            </div>
-                            <p class="text-[11px] text-slate-400">Fix anything the OCR got wrong before saving. Games will show as opponent hidden in the routine view.</p>
-                            <div id="calendar-editor-list" class="space-y-3 max-h-[32rem] overflow-y-auto pr-1">
-                                <p class="text-xs text-slate-500">No imported events yet.</p>
-                            </div>
+                    <div class="lg:col-span-2 bg-slate-950/50 border border-slate-800 rounded-2xl p-4 space-y-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest">Edit current schedule</h3>
+                            <span class="text-[11px] text-slate-400">Changes sync after you click Save.</span>
                         </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <button onclick="saveImportedCalendarSchedule()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
-                                <span class="material-icons text-base">save</span> Save Schedule
-                            </button>
-                            <button onclick="clearImportedCalendarSchedule()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
-                                <span class="material-icons text-base">delete</span> Use Default Schedule
-                            </button>
+                        <p class="text-[11px] text-slate-400">Edit the default events directly below. Games will stay opponent-hidden in the main routine view when the toggle is on.</p>
+                        <div id="calendar-editor-list" class="space-y-3 max-h-[42rem] overflow-y-auto pr-1">
+                            <p class="text-xs text-slate-500">Loading schedule editor...</p>
                         </div>
-                        <div id="calendar-save-status" class="text-xs text-slate-400"></div>
                     </div>
                 </div>
             </section>
         </div>
-
-        <!-- Tab 8: High-Fidelity Printable Wall Chart -->
-        <div id="tab-print" class="tab-content hidden space-y-6">
-            <div class="no-print bg-slate-900/60 p-4 rounded-xl border border-slate-700/50 flex flex-col sm:flex-row justify-between items-center gap-3">
-                <p class="text-xs text-slate-300 flex items-center gap-2"><span class="material-icons text-indigo-400 text-sm">print_disabled</span> Connecting to a printer? Click Print Chart below to output on paper!</p>
-                <button onclick="triggerSystemPrint()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm">
-                    <span class="material-icons text-base">print</span> Print My Wall Chart
-                </button>
-            </div>
-
-            <!-- Printing Helper Troubleshooting Modal -->
-            <div id="print-trouble-box" class="no-print bg-amber-950/30 border border-amber-500/30 rounded-2xl p-4 text-slate-300 text-xs leading-relaxed space-y-2">
-                <h4 class="font-bold text-amber-400 flex items-center gap-1.5"><span class="material-icons text-sm font-bold">warning</span> Is your browser blocking the printer pop-up?</h4>
-                <p>Because these templates run inside restricted third-party environments, printing can sometimes be disabled. The easiest solution is to copy this code block into a file named <strong class="bg-slate-950 text-indigo-300 px-1 py-0.5 rounded">chart.html</strong> on your computer desktop, double-click it, and print directly!</p>
-            </div>
-
-            <!-- Standardized Printable Visual Asset -->
-            <div class="bg-white text-slate-800 p-6 md:p-8 rounded-3xl max-w-3xl mx-auto border border-slate-200 shadow-md">
-                <div class="text-center border-b-2 border-double border-slate-200 pb-4 mb-6">
-                    <h1 class="text-xl md:text-2xl font-black text-slate-950 tracking-tight">MY WEEKLY CHORE CHART</h1>
-                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Goal Split: 50% Spend Pocket &amp; 50% Savings Vault • Max Weekly Limit: $35.00</p>
-                </div>
-
-                <div class="space-y-6 text-xs font-medium text-slate-700">
-                    <div>
-                        <h3 class="font-bold text-indigo-700 uppercase tracking-widest mb-2">📅 Daily Routines</h3>
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-500">
-                                    <th class="py-2 px-3">Task Description</th>
-                                    <th class="py-2 px-3 text-center w-16">Value</th>
-                                    <th class="py-2 px-1 text-center">M</th>
-                                    <th class="py-2 px-1 text-center">T</th>
-                                    <th class="py-2 px-1 text-center">W</th>
-                                    <th class="py-2 px-1 text-center">T</th>
-                                    <th class="py-2 px-1 text-center">F</th>
-                                    <th class="py-2 px-1 text-center">S</th>
-                                    <th class="py-2 px-1 text-center">S</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
-                                <tr>
-                                    <td class="py-2.5 px-3">Clean Room</td>
-                                    <td class="py-2.5 px-3 text-center text-indigo-600 font-bold">$0.25</td>
-                                    <td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2.5 px-3">Feeding Rio (AM)</td>
-                                    <td class="py-2.5 px-3 text-center text-indigo-600 font-bold">$0.25</td>
-                                    <td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2.5 px-3">Feeding Rio (PM)</td>
-                                    <td class="py-2.5 px-3 text-center text-indigo-600 font-bold">$0.25</td>
-                                    <td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2.5 px-3">Rio Walk (AM)</td>
-                                    <td class="py-2.5 px-3 text-center text-indigo-600 font-bold">$0.50</td>
-                                    <td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2.5 px-3">Rio Walk (PM)</td>
-                                    <td class="py-2.5 px-3 text-center text-indigo-600 font-bold">$0.50</td>
-                                    <td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2.5 px-3">Oscar Litter Bin</td>
-                                    <td class="py-2.5 px-3 text-center text-indigo-600 font-bold">$0.25</td>
-                                    <td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div>
-                        <h3 class="font-bold text-cyan-700 uppercase tracking-widest mb-2">🧹 Weekly Jobs</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <div class="flex items-center justify-between p-2.5 border border-slate-200 rounded-xl">
-                                <span class="flex items-center gap-2"><span class="print-box m-0"></span> Garbage on Thursday</span>
-                                <span class="text-indigo-600 font-bold">$2.25</span>
-                            </div>
-                            <div class="flex items-center justify-between p-2.5 border border-slate-200 rounded-xl">
-                                <span class="flex items-center gap-2"><span class="print-box m-0"></span> Garbage to Curb</span>
-                                <span class="text-indigo-600 font-bold">$2.00</span>
-                            </div>
-                            <div class="flex items-center justify-between p-2.5 border border-slate-200 rounded-xl">
-                                <span class="flex items-center gap-2"><span class="print-box m-0"></span> Fold &amp; Put Away Laundry</span>
-                                <span class="text-indigo-600 font-bold">$6.00</span>
-                            </div>
-                            <div class="flex items-center justify-between p-2.5 border border-slate-200 rounded-xl">
-                                <span class="flex items-center gap-2"><span class="print-box m-0"></span> Vacuum upstairs carpet</span>
-                                <span class="text-indigo-600 font-bold">$5.00</span>
-                            </div>
-                            <div class="flex items-center justify-between p-2.5 border border-slate-200 rounded-xl sm:col-span-2">
-                                <span class="flex items-center gap-2"><span class="print-box m-0"></span> Cleaning washrooms</span>
-                                <span class="text-indigo-600 font-bold">$11.00</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Payday Summary Jars Block -->
-                    <div class="border-t border-slate-200 pt-4 mt-4 grid grid-cols-3 gap-2 text-center">
-                        <div class="border-2 border-dashed border-slate-200 rounded-xl p-3 flex flex-col justify-between h-20">
-                            <span class="text-[9px] font-bold text-slate-500 uppercase">Total Earned</span>
-                            <span class="text-slate-400 text-[9px]">(Max $35.00)</span>
-                        </div>
-                        <div class="border-2 border-indigo-500 bg-indigo-50/20 rounded-xl p-3 flex flex-col justify-between h-20">
-                            <span class="text-[9px] font-bold text-indigo-700 uppercase">Spend Pocket (50%)</span>
-                            <span class="text-indigo-500 text-[9px]">(Fun Wants)</span>
-                        </div>
-                        <div class="border-2 border-emerald-500 bg-emerald-50/20 rounded-xl p-3 flex flex-col justify-between h-20">
-                            <span class="text-[9px] font-bold text-emerald-700 uppercase">Savings Vault (50%)</span>
-                            <span class="text-emerald-500 text-[9px]">(Locked)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <!-- Instruction Dialog: Mobility & Core -->
@@ -1181,8 +1060,7 @@
         });
 
 
-        // Calendar import helpers: free in-browser OCR + editable imported schedule
-        let calendarScreenshotFile = null;
+        // Simple schedule editor helpers: default schedule + manual edits
         let calendarDraftSchedule = null;
 
         function getHideOpponentsSetting() {
@@ -1193,6 +1071,10 @@
         function setHideOpponentsToggleFromStorage() {
             const toggle = document.getElementById('hide-opponents-toggle');
             if (toggle) toggle.checked = getHideOpponentsSetting();
+        }
+
+        function cloneDefaultCalendarSchedule() {
+            return JSON.parse(JSON.stringify(CALENDAR_WEEKS_DATA));
         }
 
         function normalizeCalendarEvent(evt) {
@@ -1216,7 +1098,7 @@
                 const raw = localStorage.getItem('custom_calendar_schedule');
                 return raw ? JSON.parse(raw) : null;
             } catch (err) {
-                console.warn('Could not read imported calendar schedule:', err);
+                console.warn('Could not read custom schedule:', err);
                 return null;
             }
         }
@@ -1242,184 +1124,58 @@
             renderDailyChecklist();
         }
 
-        function emptyCalendarSchedule() {
-            const obj = {};
-            for (let w = 1; w <= 4; w++) {
-                obj[w] = { days: {} };
-                for (let d = 0; d < 7; d++) obj[w].days[d] = [];
-            }
-            return obj;
-        }
-
-        function handleCalendarScreenshotUpload(event) {
-            const file = event.target.files && event.target.files[0];
-            calendarScreenshotFile = file || null;
-            const preview = document.getElementById('calendar-screenshot-preview');
-            const status = document.getElementById('calendar-ocr-status');
-            if (!file) {
-                if (preview) preview.classList.add('hidden');
-                if (status) status.textContent = 'No screenshot selected yet.';
-                return;
-            }
-            if (preview) {
-                preview.src = URL.createObjectURL(file);
-                preview.classList.remove('hidden');
-            }
-            if (status) status.textContent = `Selected ${file.name}. Ready to read.`;
-        }
-
-        async function runCalendarOCR() {
-            const status = document.getElementById('calendar-ocr-status');
-            const output = document.getElementById('calendar-ocr-text');
-            if (!calendarScreenshotFile) {
-                if (status) status.textContent = 'Choose a screenshot first.';
-                return;
-            }
-            if (!window.Tesseract) {
-                if (status) status.textContent = 'OCR library did not load. Check internet connection and refresh.';
-                return;
-            }
-            try {
-                if (status) status.textContent = 'Reading screenshot... 0%';
-                const result = await Tesseract.recognize(calendarScreenshotFile, 'eng', {
-                    logger: (m) => {
-                        if (m.status && status) {
-                            const pct = m.progress ? ` ${Math.round(m.progress * 100)}%` : '';
-                            status.textContent = `${m.status}${pct}`;
-                        }
-                    }
-                });
-                const text = result?.data?.text || '';
-                if (output) output.value = text.trim();
-                if (status) status.textContent = 'OCR complete. Review the text, then Detect Events.';
-            } catch (err) {
-                console.error(err);
-                if (status) status.textContent = 'OCR failed. Try a clearer screenshot or paste the schedule text manually.';
+        function ensureCalendarDraft() {
+            if (!calendarDraftSchedule) {
+                calendarDraftSchedule = getStoredImportedCalendarSchedule() || cloneDefaultCalendarSchedule();
             }
         }
 
-        function detectDayIndex(line, currentDay) {
-            const lower = line.toLowerCase();
-            const dayMap = [
-                ['monday', 'mon'], ['tuesday', 'tue', 'tues'], ['wednesday', 'wed'],
-                ['thursday', 'thu', 'thur', 'thurs'], ['friday', 'fri'], ['saturday', 'sat'], ['sunday', 'sun']
-            ];
-            for (let i = 0; i < dayMap.length; i++) {
-                if (dayMap[i].some(name => new RegExp(`\\b${name}\\b`).test(lower))) return i;
-            }
-            return currentDay;
+        function prefillManualEventTask() {
+            const type = document.getElementById('manual-event-type')?.value || 'game';
+            const task = document.getElementById('manual-event-task');
+            if (!task) return;
+            if (type === 'game') task.value = '⚽ GAME DAY - Opponent Hidden';
+            if (type === 'practice') task.value = '⚽ Outdoor Team Training - Turf (DeRo)';
+            if (type === 'personal') task.value = 'Personal Event';
+            if (type === 'other') task.value = 'Calendar Event';
         }
 
-        function extractTimeFromLine(line) {
-            const cleaned = line.replace(/\s+/g, ' ');
-            const match = cleaned.match(/\b(\d{1,2})(?::|\.)(\d{2})\s*(AM|PM)\b/i) || cleaned.match(/\b(\d{1,2})\s*(AM|PM)\b/i);
-            if (!match) {
-                if (/all\s*day/i.test(line)) return 'All Day';
-                return 'TBD';
-            }
-            let hour = match[1];
-            let minute = match[3] ? match[2] : '00';
-            let ampm = match[3] || match[2];
-            return `${hour.padStart(2, '0')}:${minute} ${ampm.toUpperCase()}`;
-        }
-
-        function classifyCalendarLine(line) {
-            const lower = line.toLowerCase();
-            if (/\b(game|match|vs\.?|versus)\b/.test(lower)) return 'game';
-            if (/\b(training|practice|train|turf|academy)\b/.test(lower)) return 'practice';
-            if (/\b(camp|coding|birthday|party|appointment|doctor|lacrosse|holiday)\b/.test(lower)) return 'personal';
-            return 'other';
-        }
-
-        function extractOpponent(line) {
-            const match = line.match(/(?:vs\.?|versus)\s+([^,;|()\n]+)/i);
-            return match ? match[1].trim() : '';
-        }
-
-        function eventFromCalendarLine(line, dayIdx) {
-            const type = classifyCalendarLine(line);
-            if (type === 'other' && !/\d{1,2}(:|\.)?\d{0,2}\s*(AM|PM)/i.test(line)) return null;
-            const time = extractTimeFromLine(line);
-            const opponent = extractOpponent(line);
-            let cat = type === 'game' || type === 'practice' ? 'dero' : 'caden';
-            let task;
-            if (type === 'game') {
-                task = getHideOpponentsSetting() ? '⚽ GAME DAY - Opponent Hidden' : `⚽ GAME DAY${opponent ? ' vs ' + opponent : ''}`;
-            } else if (type === 'practice') {
-                task = /turf/i.test(line) ? '⚽ Outdoor Team Training - Turf (DeRo)' : '⚽ Team Practice / Training';
-            } else if (/lacrosse/i.test(line)) {
-                task = '🥍 Lacrosse Match';
-            } else if (/camp/i.test(line)) {
-                task = line.match(/coding/i) ? '💻 Caden Coding Camp' : '🏅 Caden Camp';
-            } else if (/appointment|doctor|dr\.?/i.test(line)) {
-                task = '🩺 Appointment';
-            } else if (/birthday|party/i.test(line)) {
-                task = '🎉 Party / Birthday';
-            } else if (/holiday/i.test(line)) {
-                task = '🍁 Holiday';
-            } else {
-                task = line.replace(/\s+/g, ' ').trim().slice(0, 80) || 'Calendar Event';
-            }
-            return { time, task, cat, type, opponent, sourceText: line.trim(), dayIdx };
-        }
-
-        function parseCalendarOCRText() {
-            const text = document.getElementById('calendar-ocr-text')?.value || '';
-            const status = document.getElementById('calendar-save-status');
-            const applyAll = document.getElementById('apply-all-weeks-toggle')?.checked !== false;
-            const selectedWeek = parseInt(document.getElementById('calendar-import-week-select')?.value || currentWeekNum, 10);
-            const draft = emptyCalendarSchedule();
-            let currentDay = 2; // default Wednesday, since many game screenshots focus there
-            let found = 0;
-
-            text.split(/\n+/).map(l => l.trim()).filter(Boolean).forEach((line) => {
-                currentDay = detectDayIndex(line, currentDay);
-                const evt = eventFromCalendarLine(line, currentDay);
-                if (!evt) return;
-                found++;
-                const weeks = applyAll ? [1, 2, 3, 4] : [selectedWeek];
-                weeks.forEach((w) => {
-                    draft[w].days[currentDay].push({
-                        time: evt.time,
-                        task: evt.task,
-                        cat: evt.cat,
-                        type: evt.type,
-                        opponent: evt.opponent,
-                        sourceText: evt.sourceText
-                    });
-                });
-            });
-
-            calendarDraftSchedule = draft;
-            renderCalendarEditor();
-            if (status) status.textContent = found ? `Detected ${found} event line(s). Review/edit, then Save Schedule.` : 'No clear events detected. Try typing one event per line with day + time.';
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
         }
 
         function renderCalendarEditor() {
             setHideOpponentsToggleFromStorage();
             const list = document.getElementById('calendar-editor-list');
             if (!list) return;
-            const schedule = calendarDraftSchedule || getStoredImportedCalendarSchedule();
-            if (!schedule) {
-                list.innerHTML = '<p class="text-xs text-slate-500">No imported events yet.</p>';
-                return;
-            }
+            ensureCalendarDraft();
+            const schedule = calendarDraftSchedule;
             const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
             let html = '';
             for (let w = 1; w <= 4; w++) {
+                html += `<div class="rounded-2xl border border-slate-800 bg-slate-900/30 p-3 space-y-2"><h4 class="text-xs font-black text-cyan-300 uppercase tracking-widest">Week ${w}</h4>`;
                 for (let d = 0; d < 7; d++) {
                     const events = schedule[String(w)]?.days?.[String(d)] || schedule[w]?.days?.[d] || [];
+                    html += `<div class="border-t border-slate-800/70 pt-2 mt-2"><div class="text-[10px] text-slate-400 font-bold uppercase mb-2">${dayNames[d]}</div>`;
+                    if (!events.length) {
+                        html += `<p class="text-[11px] text-slate-600 italic mb-2">No extra schedule events.</p>`;
+                    }
                     events.forEach((evt, idx) => {
-                        const safeTask = (evt.task || '').replace(/"/g, '&quot;');
-                        const safeOpponent = (evt.opponent || '').replace(/"/g, '&quot;');
+                        const safeTask = escapeHtml(evt.task || '');
+                        const safeOpponent = escapeHtml(evt.opponent || '');
+                        const safeTime = escapeHtml(evt.time || '');
                         html += `
-                            <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-3 space-y-2">
+                            <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-3 space-y-2 mb-2">
                                 <div class="flex items-center justify-between gap-2">
-                                    <span class="text-[10px] font-bold text-cyan-300 uppercase tracking-widest">Week ${w} • ${dayNames[d]}</span>
+                                    <span class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest">${dayNames[d]} Event ${idx + 1}</span>
                                     <button onclick="deleteCalendarDraftEvent(${w}, ${d}, ${idx})" class="text-rose-300 hover:text-rose-200 text-xs font-bold">Delete</button>
                                 </div>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <input value="${evt.time || ''}" oninput="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'time', this.value)" class="rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2" placeholder="Time">
+                                    <input value="${safeTime}" oninput="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'time', this.value)" class="rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2" placeholder="Time">
                                     <select onchange="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'type', this.value)" class="rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2">
                                         <option value="game" ${evt.type === 'game' ? 'selected' : ''}>Game</option>
                                         <option value="practice" ${evt.type === 'practice' ? 'selected' : ''}>Practice</option>
@@ -1428,16 +1184,14 @@
                                     </select>
                                 </div>
                                 <input value="${safeTask}" oninput="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'task', this.value)" class="w-full rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2" placeholder="Task label">
-                                <input value="${safeOpponent}" oninput="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'opponent', this.value)" class="w-full rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2" placeholder="Opponent (hidden in routine view)">
+                                <input value="${safeOpponent}" oninput="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'opponent', this.value)" class="w-full rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2" placeholder="Opponent (optional, hidden in routine view)">
                             </div>`;
                     });
+                    html += `</div>`;
                 }
+                html += `</div>`;
             }
-            list.innerHTML = html || '<p class="text-xs text-slate-500">No events in draft. Add one manually or run OCR.</p>';
-        }
-
-        function ensureCalendarDraft() {
-            if (!calendarDraftSchedule) calendarDraftSchedule = getStoredImportedCalendarSchedule() || emptyCalendarSchedule();
+            list.innerHTML = html;
         }
 
         function updateCalendarDraftEvent(week, day, index, field, value) {
@@ -1459,9 +1213,16 @@
 
         function addManualCalendarEvent() {
             ensureCalendarDraft();
-            const week = parseInt(document.getElementById('calendar-import-week-select')?.value || currentWeekNum, 10);
-            const day = currentDayIdx;
-            calendarDraftSchedule[week].days[day].push({ time: '07:00 PM', task: '⚽ GAME DAY - Opponent Hidden', cat: 'dero', type: 'game', opponent: '' });
+            const week = parseInt(document.getElementById('manual-event-week')?.value || currentWeekNum, 10);
+            const day = parseInt(document.getElementById('manual-event-day')?.value || currentDayIdx, 10);
+            const type = document.getElementById('manual-event-type')?.value || 'game';
+            const time = document.getElementById('manual-event-time')?.value || 'TBD';
+            const task = document.getElementById('manual-event-task')?.value || (type === 'game' ? '⚽ GAME DAY - Opponent Hidden' : 'Calendar Event');
+            const opponent = document.getElementById('manual-event-opponent')?.value || '';
+            const cat = type === 'game' || type === 'practice' ? 'dero' : 'caden';
+            calendarDraftSchedule[week].days[day].push({ time, task, cat, type, opponent });
+            const status = document.getElementById('calendar-save-status');
+            if (status) status.textContent = 'Event added in the editor. Click Save Schedule Edits to sync it.';
             renderCalendarEditor();
         }
 
@@ -1470,15 +1231,22 @@
             localStorage.setItem('custom_calendar_schedule', JSON.stringify(calendarDraftSchedule));
             localStorage.setItem('hide_opponents_enabled', getHideOpponentsSetting() ? 'true' : 'false');
             const status = document.getElementById('calendar-save-status');
-            if (status) status.textContent = 'Saved! Schedule will sync across your devices.';
+            if (status) status.textContent = 'Saved! Your schedule edits will sync across devices.';
             renderDailyChecklist();
         }
 
+        function resetCalendarDraftToDefault() {
+            calendarDraftSchedule = cloneDefaultCalendarSchedule();
+            const status = document.getElementById('calendar-save-status');
+            if (status) status.textContent = 'Default schedule loaded into the editor. Click Save if you want to replace your saved edits.';
+            renderCalendarEditor();
+        }
+
         function clearImportedCalendarSchedule() {
-            calendarDraftSchedule = null;
+            calendarDraftSchedule = cloneDefaultCalendarSchedule();
             localStorage.removeItem('custom_calendar_schedule');
             const status = document.getElementById('calendar-save-status');
-            if (status) status.textContent = 'Imported schedule cleared. Default schedule is active again.';
+            if (status) status.textContent = 'Saved edits cleared. Default schedule is active again.';
             renderCalendarEditor();
             renderDailyChecklist();
         }
