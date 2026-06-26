@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
     <!-- Tailwind CSS Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Free in-browser OCR engine for calendar screenshots (no API key / no billing) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     
     <style>
         body {
@@ -164,6 +166,9 @@
                 </button>
                 <button onclick="switchTab('guides')" id="btn-guides" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
                     <span class="material-icons text-base">menu_book</span> Money Guides
+                </button>
+                <button onclick="switchTab('calendar')" id="btn-calendar" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                    <span class="material-icons text-base">event_note</span> Calendar Import
                 </button>
                 <button onclick="switchTab('print')" id="btn-print" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
                     <span class="material-icons text-base">print</span> Printable Wall Chart
@@ -738,7 +743,85 @@
             </article>
         </div>
 
-        <!-- Tab 7: High-Fidelity Printable Wall Chart -->
+
+        <!-- Tab 7: Calendar Screenshot Import & Editor -->
+        <div id="tab-calendar" class="tab-content hidden space-y-6">
+            <section class="glass-card rounded-3xl p-4 md:p-6 shadow-xl space-y-5">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-base md:text-lg font-bold text-cyan-400 flex items-center gap-2">
+                            <span class="material-icons">event_note</span> Calendar Screenshot Import
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">Free in-browser OCR reads your screenshot. Review/edit before saving. Opponents stay hidden by default.</p>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2">
+                        <input type="checkbox" id="hide-opponents-toggle" class="hub-checkbox w-6 h-6" checked onchange="toggleHideOpponents()">
+                        <label for="hide-opponents-toggle" class="text-xs font-bold text-slate-300 cursor-pointer">Hide opponents</label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <div class="space-y-4">
+                        <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 space-y-3">
+                            <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest">1. Upload screenshot</h3>
+                            <input id="calendar-screenshot-input" type="file" accept="image/*" onchange="handleCalendarScreenshotUpload(event)" class="block w-full text-xs text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
+                            <img id="calendar-screenshot-preview" class="hidden max-h-72 w-full object-contain rounded-xl border border-slate-800 bg-slate-950" alt="Calendar screenshot preview">
+                            <button onclick="runCalendarOCR()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
+                                <span class="material-icons text-base">document_scanner</span> Read Screenshot in App
+                            </button>
+                            <p id="calendar-ocr-status" class="text-xs text-slate-400">No screenshot selected yet.</p>
+                        </div>
+
+                        <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 space-y-3">
+                            <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest">2. OCR text</h3>
+                            <textarea id="calendar-ocr-text" rows="9" placeholder="OCR text will appear here. You can also paste schedule text manually." class="w-full rounded-xl bg-slate-900/80 border border-slate-800 text-slate-100 placeholder-slate-500 text-xs p-3 focus:outline-none focus:border-indigo-500"></textarea>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <label class="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2 cursor-pointer">
+                                    <input type="checkbox" id="apply-all-weeks-toggle" class="hub-checkbox w-6 h-6" checked>
+                                    Apply detected events to all 4 weeks
+                                </label>
+                                <select id="calendar-import-week-select" class="rounded-xl bg-slate-900/80 border border-slate-800 text-slate-100 text-xs px-3 py-2 focus:outline-none focus:border-indigo-500">
+                                    <option value="1">Selected Week: Week 1</option>
+                                    <option value="2">Selected Week: Week 2</option>
+                                    <option value="3">Selected Week: Week 3</option>
+                                    <option value="4">Selected Week: Week 4</option>
+                                </select>
+                            </div>
+                            <button onclick="parseCalendarOCRText()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
+                                <span class="material-icons text-base">auto_fix_high</span> Detect Events
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 space-y-3">
+                            <div class="flex items-center justify-between gap-3">
+                                <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest">3. Review & edit</h3>
+                                <button onclick="addManualCalendarEvent()" class="text-xs px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold flex items-center gap-1">
+                                    <span class="material-icons text-sm">add</span> Add Event
+                                </button>
+                            </div>
+                            <p class="text-[11px] text-slate-400">Fix anything the OCR got wrong before saving. Games will show as opponent hidden in the routine view.</p>
+                            <div id="calendar-editor-list" class="space-y-3 max-h-[32rem] overflow-y-auto pr-1">
+                                <p class="text-xs text-slate-500">No imported events yet.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="saveImportedCalendarSchedule()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
+                                <span class="material-icons text-base">save</span> Save Schedule
+                            </button>
+                            <button onclick="clearImportedCalendarSchedule()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
+                                <span class="material-icons text-base">delete</span> Use Default Schedule
+                            </button>
+                        </div>
+                        <div id="calendar-save-status" class="text-xs text-slate-400"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tab 8: High-Fidelity Printable Wall Chart -->
         <div id="tab-print" class="tab-content hidden space-y-6">
             <div class="no-print bg-slate-900/60 p-4 rounded-xl border border-slate-700/50 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <p class="text-xs text-slate-300 flex items-center gap-2"><span class="material-icons text-indigo-400 text-sm">print_disabled</span> Connecting to a printer? Click Print Chart below to output on paper!</p>
@@ -1086,6 +1169,8 @@
                 selectSoccerWeek(currentSoccerWeekNum);
                 updateMoneyCalculations();
                 loadAgreementProgress();
+                setHideOpponentsToggleFromStorage();
+                renderCalendarEditor();
             };
 
             if (window.startCloudBackedApp) {
@@ -1094,6 +1179,309 @@
                 window.__startLocalApp();
             }
         });
+
+
+        // Calendar import helpers: free in-browser OCR + editable imported schedule
+        let calendarScreenshotFile = null;
+        let calendarDraftSchedule = null;
+
+        function getHideOpponentsSetting() {
+            const raw = localStorage.getItem('hide_opponents_enabled');
+            return raw === null ? true : raw === 'true';
+        }
+
+        function setHideOpponentsToggleFromStorage() {
+            const toggle = document.getElementById('hide-opponents-toggle');
+            if (toggle) toggle.checked = getHideOpponentsSetting();
+        }
+
+        function normalizeCalendarEvent(evt) {
+            const type = evt.type || (evt.task && evt.task.toLowerCase().includes('game') ? 'game' : 'other');
+            let task = evt.task || 'Calendar Event';
+            if (type === 'game' && getHideOpponentsSetting()) {
+                task = '⚽ GAME DAY - Opponent Hidden';
+            }
+            return {
+                time: evt.time || 'TBD',
+                task,
+                cat: evt.cat || (type === 'game' || type === 'practice' ? 'dero' : 'caden'),
+                type,
+                opponent: evt.opponent || '',
+                location: evt.location || ''
+            };
+        }
+
+        function getStoredImportedCalendarSchedule() {
+            try {
+                const raw = localStorage.getItem('custom_calendar_schedule');
+                return raw ? JSON.parse(raw) : null;
+            } catch (err) {
+                console.warn('Could not read imported calendar schedule:', err);
+                return null;
+            }
+        }
+
+        function getActiveCalendarWeeksData() {
+            const stored = getStoredImportedCalendarSchedule();
+            if (!stored) return CALENDAR_WEEKS_DATA;
+            const normalized = {};
+            for (let w = 1; w <= 4; w++) {
+                normalized[w] = { days: {} };
+                for (let d = 0; d < 7; d++) {
+                    const events = stored[String(w)]?.days?.[String(d)] || stored[w]?.days?.[d] || [];
+                    normalized[w].days[d] = events.map(normalizeCalendarEvent);
+                }
+            }
+            return normalized;
+        }
+
+        function toggleHideOpponents() {
+            const toggle = document.getElementById('hide-opponents-toggle');
+            localStorage.setItem('hide_opponents_enabled', toggle && toggle.checked ? 'true' : 'false');
+            renderCalendarEditor();
+            renderDailyChecklist();
+        }
+
+        function emptyCalendarSchedule() {
+            const obj = {};
+            for (let w = 1; w <= 4; w++) {
+                obj[w] = { days: {} };
+                for (let d = 0; d < 7; d++) obj[w].days[d] = [];
+            }
+            return obj;
+        }
+
+        function handleCalendarScreenshotUpload(event) {
+            const file = event.target.files && event.target.files[0];
+            calendarScreenshotFile = file || null;
+            const preview = document.getElementById('calendar-screenshot-preview');
+            const status = document.getElementById('calendar-ocr-status');
+            if (!file) {
+                if (preview) preview.classList.add('hidden');
+                if (status) status.textContent = 'No screenshot selected yet.';
+                return;
+            }
+            if (preview) {
+                preview.src = URL.createObjectURL(file);
+                preview.classList.remove('hidden');
+            }
+            if (status) status.textContent = `Selected ${file.name}. Ready to read.`;
+        }
+
+        async function runCalendarOCR() {
+            const status = document.getElementById('calendar-ocr-status');
+            const output = document.getElementById('calendar-ocr-text');
+            if (!calendarScreenshotFile) {
+                if (status) status.textContent = 'Choose a screenshot first.';
+                return;
+            }
+            if (!window.Tesseract) {
+                if (status) status.textContent = 'OCR library did not load. Check internet connection and refresh.';
+                return;
+            }
+            try {
+                if (status) status.textContent = 'Reading screenshot... 0%';
+                const result = await Tesseract.recognize(calendarScreenshotFile, 'eng', {
+                    logger: (m) => {
+                        if (m.status && status) {
+                            const pct = m.progress ? ` ${Math.round(m.progress * 100)}%` : '';
+                            status.textContent = `${m.status}${pct}`;
+                        }
+                    }
+                });
+                const text = result?.data?.text || '';
+                if (output) output.value = text.trim();
+                if (status) status.textContent = 'OCR complete. Review the text, then Detect Events.';
+            } catch (err) {
+                console.error(err);
+                if (status) status.textContent = 'OCR failed. Try a clearer screenshot or paste the schedule text manually.';
+            }
+        }
+
+        function detectDayIndex(line, currentDay) {
+            const lower = line.toLowerCase();
+            const dayMap = [
+                ['monday', 'mon'], ['tuesday', 'tue', 'tues'], ['wednesday', 'wed'],
+                ['thursday', 'thu', 'thur', 'thurs'], ['friday', 'fri'], ['saturday', 'sat'], ['sunday', 'sun']
+            ];
+            for (let i = 0; i < dayMap.length; i++) {
+                if (dayMap[i].some(name => new RegExp(`\\b${name}\\b`).test(lower))) return i;
+            }
+            return currentDay;
+        }
+
+        function extractTimeFromLine(line) {
+            const cleaned = line.replace(/\s+/g, ' ');
+            const match = cleaned.match(/\b(\d{1,2})(?::|\.)(\d{2})\s*(AM|PM)\b/i) || cleaned.match(/\b(\d{1,2})\s*(AM|PM)\b/i);
+            if (!match) {
+                if (/all\s*day/i.test(line)) return 'All Day';
+                return 'TBD';
+            }
+            let hour = match[1];
+            let minute = match[3] ? match[2] : '00';
+            let ampm = match[3] || match[2];
+            return `${hour.padStart(2, '0')}:${minute} ${ampm.toUpperCase()}`;
+        }
+
+        function classifyCalendarLine(line) {
+            const lower = line.toLowerCase();
+            if (/\b(game|match|vs\.?|versus)\b/.test(lower)) return 'game';
+            if (/\b(training|practice|train|turf|academy)\b/.test(lower)) return 'practice';
+            if (/\b(camp|coding|birthday|party|appointment|doctor|lacrosse|holiday)\b/.test(lower)) return 'personal';
+            return 'other';
+        }
+
+        function extractOpponent(line) {
+            const match = line.match(/(?:vs\.?|versus)\s+([^,;|()\n]+)/i);
+            return match ? match[1].trim() : '';
+        }
+
+        function eventFromCalendarLine(line, dayIdx) {
+            const type = classifyCalendarLine(line);
+            if (type === 'other' && !/\d{1,2}(:|\.)?\d{0,2}\s*(AM|PM)/i.test(line)) return null;
+            const time = extractTimeFromLine(line);
+            const opponent = extractOpponent(line);
+            let cat = type === 'game' || type === 'practice' ? 'dero' : 'caden';
+            let task;
+            if (type === 'game') {
+                task = getHideOpponentsSetting() ? '⚽ GAME DAY - Opponent Hidden' : `⚽ GAME DAY${opponent ? ' vs ' + opponent : ''}`;
+            } else if (type === 'practice') {
+                task = /turf/i.test(line) ? '⚽ Outdoor Team Training - Turf (DeRo)' : '⚽ Team Practice / Training';
+            } else if (/lacrosse/i.test(line)) {
+                task = '🥍 Lacrosse Match';
+            } else if (/camp/i.test(line)) {
+                task = line.match(/coding/i) ? '💻 Caden Coding Camp' : '🏅 Caden Camp';
+            } else if (/appointment|doctor|dr\.?/i.test(line)) {
+                task = '🩺 Appointment';
+            } else if (/birthday|party/i.test(line)) {
+                task = '🎉 Party / Birthday';
+            } else if (/holiday/i.test(line)) {
+                task = '🍁 Holiday';
+            } else {
+                task = line.replace(/\s+/g, ' ').trim().slice(0, 80) || 'Calendar Event';
+            }
+            return { time, task, cat, type, opponent, sourceText: line.trim(), dayIdx };
+        }
+
+        function parseCalendarOCRText() {
+            const text = document.getElementById('calendar-ocr-text')?.value || '';
+            const status = document.getElementById('calendar-save-status');
+            const applyAll = document.getElementById('apply-all-weeks-toggle')?.checked !== false;
+            const selectedWeek = parseInt(document.getElementById('calendar-import-week-select')?.value || currentWeekNum, 10);
+            const draft = emptyCalendarSchedule();
+            let currentDay = 2; // default Wednesday, since many game screenshots focus there
+            let found = 0;
+
+            text.split(/\n+/).map(l => l.trim()).filter(Boolean).forEach((line) => {
+                currentDay = detectDayIndex(line, currentDay);
+                const evt = eventFromCalendarLine(line, currentDay);
+                if (!evt) return;
+                found++;
+                const weeks = applyAll ? [1, 2, 3, 4] : [selectedWeek];
+                weeks.forEach((w) => {
+                    draft[w].days[currentDay].push({
+                        time: evt.time,
+                        task: evt.task,
+                        cat: evt.cat,
+                        type: evt.type,
+                        opponent: evt.opponent,
+                        sourceText: evt.sourceText
+                    });
+                });
+            });
+
+            calendarDraftSchedule = draft;
+            renderCalendarEditor();
+            if (status) status.textContent = found ? `Detected ${found} event line(s). Review/edit, then Save Schedule.` : 'No clear events detected. Try typing one event per line with day + time.';
+        }
+
+        function renderCalendarEditor() {
+            setHideOpponentsToggleFromStorage();
+            const list = document.getElementById('calendar-editor-list');
+            if (!list) return;
+            const schedule = calendarDraftSchedule || getStoredImportedCalendarSchedule();
+            if (!schedule) {
+                list.innerHTML = '<p class="text-xs text-slate-500">No imported events yet.</p>';
+                return;
+            }
+            const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            let html = '';
+            for (let w = 1; w <= 4; w++) {
+                for (let d = 0; d < 7; d++) {
+                    const events = schedule[String(w)]?.days?.[String(d)] || schedule[w]?.days?.[d] || [];
+                    events.forEach((evt, idx) => {
+                        const safeTask = (evt.task || '').replace(/"/g, '&quot;');
+                        const safeOpponent = (evt.opponent || '').replace(/"/g, '&quot;');
+                        html += `
+                            <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-3 space-y-2">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="text-[10px] font-bold text-cyan-300 uppercase tracking-widest">Week ${w} • ${dayNames[d]}</span>
+                                    <button onclick="deleteCalendarDraftEvent(${w}, ${d}, ${idx})" class="text-rose-300 hover:text-rose-200 text-xs font-bold">Delete</button>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input value="${evt.time || ''}" oninput="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'time', this.value)" class="rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2" placeholder="Time">
+                                    <select onchange="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'type', this.value)" class="rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2">
+                                        <option value="game" ${evt.type === 'game' ? 'selected' : ''}>Game</option>
+                                        <option value="practice" ${evt.type === 'practice' ? 'selected' : ''}>Practice</option>
+                                        <option value="personal" ${evt.type === 'personal' ? 'selected' : ''}>Personal</option>
+                                        <option value="other" ${evt.type === 'other' ? 'selected' : ''}>Other</option>
+                                    </select>
+                                </div>
+                                <input value="${safeTask}" oninput="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'task', this.value)" class="w-full rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2" placeholder="Task label">
+                                <input value="${safeOpponent}" oninput="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'opponent', this.value)" class="w-full rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2" placeholder="Opponent (hidden in routine view)">
+                            </div>`;
+                    });
+                }
+            }
+            list.innerHTML = html || '<p class="text-xs text-slate-500">No events in draft. Add one manually or run OCR.</p>';
+        }
+
+        function ensureCalendarDraft() {
+            if (!calendarDraftSchedule) calendarDraftSchedule = getStoredImportedCalendarSchedule() || emptyCalendarSchedule();
+        }
+
+        function updateCalendarDraftEvent(week, day, index, field, value) {
+            ensureCalendarDraft();
+            const events = calendarDraftSchedule[week].days[day];
+            if (!events[index]) return;
+            events[index][field] = value;
+            if (field === 'type') {
+                events[index].cat = value === 'game' || value === 'practice' ? 'dero' : 'caden';
+                if (value === 'game' && getHideOpponentsSetting()) events[index].task = '⚽ GAME DAY - Opponent Hidden';
+            }
+        }
+
+        function deleteCalendarDraftEvent(week, day, index) {
+            ensureCalendarDraft();
+            calendarDraftSchedule[week].days[day].splice(index, 1);
+            renderCalendarEditor();
+        }
+
+        function addManualCalendarEvent() {
+            ensureCalendarDraft();
+            const week = parseInt(document.getElementById('calendar-import-week-select')?.value || currentWeekNum, 10);
+            const day = currentDayIdx;
+            calendarDraftSchedule[week].days[day].push({ time: '07:00 PM', task: '⚽ GAME DAY - Opponent Hidden', cat: 'dero', type: 'game', opponent: '' });
+            renderCalendarEditor();
+        }
+
+        function saveImportedCalendarSchedule() {
+            ensureCalendarDraft();
+            localStorage.setItem('custom_calendar_schedule', JSON.stringify(calendarDraftSchedule));
+            localStorage.setItem('hide_opponents_enabled', getHideOpponentsSetting() ? 'true' : 'false');
+            const status = document.getElementById('calendar-save-status');
+            if (status) status.textContent = 'Saved! Schedule will sync across your devices.';
+            renderDailyChecklist();
+        }
+
+        function clearImportedCalendarSchedule() {
+            calendarDraftSchedule = null;
+            localStorage.removeItem('custom_calendar_schedule');
+            const status = document.getElementById('calendar-save-status');
+            if (status) status.textContent = 'Imported schedule cleared. Default schedule is active again.';
+            renderCalendarEditor();
+            renderDailyChecklist();
+        }
 
         // Tab Navigation Switch System
         function switchTab(tabId) {
@@ -1168,8 +1556,9 @@
             const checklistMount = document.getElementById('checklist-mount');
             checklistMount.innerHTML = '';
 
-            const weekData = CALENDAR_WEEKS_DATA[currentWeekNum];
-            let activeCalendarEvents = weekData ? [...weekData.days[currentDayIdx]] : [];
+            const activeCalendarData = getActiveCalendarWeeksData();
+            const weekData = activeCalendarData[currentWeekNum];
+            let activeCalendarEvents = weekData ? [...(weekData.days[currentDayIdx] || [])] : [];
             
             if (currentDayIdx === 0 && localStorage.getItem('older_practice_monday_active') === 'true') {
                 activeCalendarEvents.push({ time: "06:00 PM", task: "⚽ Caden 2013 DeRo Practice (With Year Older)", cat: "caden" });
@@ -1691,7 +2080,9 @@
             'goalName',
             'goalPrice',
             'goalFund',
-            'older_practice_monday_active'
+            'older_practice_monday_active',
+            'custom_calendar_schedule',
+            'hide_opponents_enabled'
         ];
 
         const app = initializeApp(firebaseConfig);
@@ -1791,6 +2182,7 @@
                     updateMoneyCalculations();
                     loadAgreementProgress();
                     calculateDailyCompletion();
+                    if (typeof renderCalendarEditor === 'function') renderCalendarEditor();
                 } catch (err) {
                     console.warn('Refreshed cloud data, but UI refresh had a warning:', err);
                 }
