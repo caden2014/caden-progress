@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeRo Academy & Master Junior Finance Hub</title>
+    <!-- Google Sans Typography and Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
+    <!-- Tailwind CSS Engine -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #060814 0%, #0b112c 50%, #050716 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(13, 20, 47, 0.75);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Information Action Buttons */
+        .info-btn {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+            border-radius: 99px;
+            padding: 3px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .info-btn:hover {
+            background: rgba(99, 102, 241, 0.35);
+            color: #a5b4fc;
+            transform: scale(1.1);
+        }
+
+        /* Interactive Premium Checkboxes */
+        .hub-checkbox {
+            position: relative;
+            appearance: none;
+            width: 1.85rem;
+            height: 1.85rem;
+            border: 2px solid #273562;
+            border-radius: 0.6rem;
+            background-color: #0c122c;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hub-checkbox:hover {
+            border-color: #6366f1;
+            background-color: #080d24;
+            transform: scale(1.08);
+        }
+
+        .hub-checkbox:checked {
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            border-color: transparent;
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+        }
+
+        .hub-checkbox:checked::after {
+            content: '✓';
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 900;
+        }
+
+        /* Scrollbars Custom Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(6, 8, 20, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #273562;
+            border-radius: 99px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4f46e5;
+        }
+
+        /* Printing Adjustments */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .chart-card {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+            .print-box {
+                width: 20px;
+                height: 20px;
+                border: 2px solid #94a3b8 !important;
+                border-radius: 4px;
+                background: #fff;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-100 p-3 md:p-8 flex flex-col items-center">
+
+    <div class="w-full max-w-5xl space-y-6">
+        
+        <!-- Header Banner Area -->
+        <header class="glass-card rounded-3xl p-4 md:p-6 shadow-2xl space-y-4 no-print">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-cyan-500 flex items-center justify-center text-2xl shadow-lg border border-white/10 animate-pulse">
+                        ⚽
+                    </div>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+                            DE RO ACADEMY &amp; MASTER HUB
+                        </h1>
+                        <p class="text-xs text-slate-400 font-medium">All-In-One Routine Scheduler, Chore Ledger, Training Programs &amp; Financial Guides</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="openResetModal()" class="text-xs px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-900/60 text-slate-300 hover:text-rose-200 transition font-bold flex items-center gap-1.5 shadow-sm">
+                        <span class="material-icons text-sm">restart_alt</span> Reset All Hub Progress
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Button Navigation Bar -->
+            <div class="flex border-t border-slate-800/80 pt-4 overflow-x-auto gap-2">
+                <button onclick="switchTab('daily')" id="btn-daily" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap bg-indigo-600 text-white transition-all shadow-md">
+                    <span class="material-icons text-base">watch_later</span> Routine Agenda
+                </button>
+                <button onclick="switchTab('money')" id="btn-money" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                    <span class="material-icons text-base">payments</span> Chore Ledger &amp; Calculator
+                </button>
+                <button onclick="switchTab('soccer')" id="btn-soccer" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                    <span class="material-icons text-base">sports_soccer</span> Soccer Solo Drills
+                </button>
+                <button onclick="switchTab('fitness')" id="btn-fitness" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                    <span class="material-icons text-base">fitness_center</span> Fitness &amp; Nutrition
+                </button>
+                <button onclick="switchTab('dad')" id="btn-dad" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                    <span class="material-icons text-base">draw</span> Proposal &amp; Trial Status
+                </button>
+                <button onclick="switchTab('guides')" id="btn-guides" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                    <span class="material-icons text-base">menu_book</span> Money Guides
+                </button>
+                <button onclick="switchTab('print')" id="btn-print" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+                    <span class="material-icons text-base">print</span> Printable Wall Chart
+                </button>
+            </div>
+        </header>
+
+        <!-- Tab 1: Chronological Agenda -->
+        <main id="tab-daily" class="tab-content grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Agenda Grid Left Side -->
+            <div class="lg:col-span-2 space-y-6">
+                <section class="glass-card rounded-3xl p-4 md:p-6 shadow-xl space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-slate-800 pb-4">
+                        <div class="space-y-1">
+                            <h2 class="text-base md:text-lg font-bold text-indigo-400 flex items-center gap-2">
+                                <span class="material-icons">schedule</span> Chronological Day Plan
+                            </h2>
+                            <p class="text-xs text-indigo-300 font-bold" id="dates-range-indicator">Loading Dates...</p>
+                            <p class="text-[11px] text-slate-400">Rio walking and feeding are set precisely at 7:00 AM &amp; 5:00 PM twice a day!</p>
+                        </div>
+                        
+                        <div class="flex flex-col gap-2 items-end">
+                            <!-- Week Selection Pill Row -->
+                            <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-850 gap-1">
+                                <button onclick="selectWeek(1)" class="week-btn-daily px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all" id="week-daily-1">Week 1</button>
+                                <button onclick="selectWeek(2)" class="week-btn-daily px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all" id="week-daily-2">Week 2</button>
+                                <button onclick="selectWeek(3)" class="week-btn-daily px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all" id="week-daily-3">Week 3</button>
+                                <button onclick="selectWeek(4)" class="week-btn-daily px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all" id="week-daily-4">Week 4</button>
+                            </div>
+                            
+                            <!-- Day Selection Pill Row (Monday to Sunday) -->
+                            <div class="flex bg-slate-900/80 p-1 rounded-xl border border-slate-800 overflow-x-auto self-start sm:self-end">
+                                <button onclick="selectDay(0)" class="day-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all" id="day-0">M</button>
+                                <button onclick="selectDay(1)" class="day-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all" id="day-1">T</button>
+                                <button onclick="selectDay(2)" class="day-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all" id="day-2">W</button>
+                                <button onclick="selectDay(3)" class="day-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all" id="day-3">T</button>
+                                <button onclick="selectDay(4)" class="day-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all" id="day-4">F</button>
+                                <button onclick="selectDay(5)" class="day-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all" id="day-5">S</button>
+                                <button onclick="selectDay(6)" class="day-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all" id="day-6">S</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Monday Optional 2013s Practice Switcher -->
+                    <div id="monday-toggle-container" class="hidden p-3 rounded-2xl bg-indigo-950/25 border border-indigo-500/20 flex items-center justify-between">
+                        <div class="text-left space-y-0.5">
+                            <span class="text-xs font-bold text-indigo-300 uppercase tracking-wider block">Older Group Practice Option</span>
+                            <span class="text-xs text-slate-300">Do you have practice tonight with the older 2013s?</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="monday-older-toggle" class="sr-only peer" onchange="toggleMondayOlderPractice()">
+                            <div class="w-11 h-6 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+
+                    <!-- Dynamic Day Checklist Mount Point -->
+                    <div id="checklist-mount" class="space-y-3">
+                        <!-- Populated dynamically and synced directly to the database -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Agenda Grid Right Side -->
+            <div class="space-y-6">
+                <!-- Circular Routine Progress Radial Tracker -->
+                <section class="glass-card rounded-3xl p-6 shadow-xl text-center space-y-4">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest">Daily Routine Progress</h3>
+                    
+                    <div class="relative w-36 h-36 mx-auto flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90">
+                            <circle cx="72" cy="72" r="64" stroke="#101736" stroke-width="10" fill="transparent" />
+                            <circle id="score-ring" cx="72" cy="72" r="64" stroke="url(#indigoCyan)" stroke-width="10" fill="transparent" 
+                                    stroke-dasharray="402" stroke-dashoffset="402" stroke-linecap="round" class="transition-all duration-500" />
+                            <defs>
+                                <linearGradient id="indigoCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#6366f1" />
+                                    <stop offset="100%" stop-color="#06b6d4" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span id="score-percent" class="text-3xl font-black text-white">0%</span>
+                            <span class="text-[10px] text-slate-400 font-semibold tracking-wider">COMPLETED</span>
+                        </div>
+                    </div>
+
+                    <p id="coach-verdict" class="text-xs text-slate-300 italic px-2">
+                        "Your daily habits dictate your success. Complete your routines to build momentum."
+                    </p>
+                </section>
+
+                <!-- Financial Mini Dashboard Status Card -->
+                <section class="glass-card rounded-3xl p-6 shadow-xl space-y-4">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-800/80 pb-2">Ledger Balance Status</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-indigo-950/20 border border-indigo-500/10 p-3 rounded-xl">
+                            <span class="text-[10px] text-indigo-300 font-bold block uppercase tracking-wider">Spend Pocket</span>
+                            <span class="text-lg font-black text-white text-indigo-400" id="mini-spend-val">$0.00</span>
+                        </div>
+                        <div class="bg-emerald-950/20 border border-emerald-500/10 p-3 rounded-xl">
+                            <span class="text-[10px] text-emerald-300 font-bold block uppercase tracking-wider">Savings Vault</span>
+                            <span class="text-lg font-black text-white text-emerald-400" id="mini-save-val">$0.00</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Tab 2: Ledger Matrix & Calculator -->
+        <div id="tab-money" class="tab-content hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Daily Ledger Grid -->
+                <section class="glass-card rounded-3xl p-4 md:p-6 shadow-xl space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h2 class="text-base md:text-lg font-bold text-indigo-400 flex items-center gap-2">
+                            <span class="material-icons">event</span> Daily Routines (Ledger Grid)
+                        </h2>
+                        <span class="text-[10px] bg-indigo-500/10 text-indigo-300 px-2.5 py-1 rounded-full font-semibold border border-indigo-500/20">Synced to Timelines</span>
+                    </div>
+
+                    <div class="overflow-x-auto font-medium">
+                        <table class="w-full min-w-[500px]">
+                            <thead>
+                                <tr class="text-slate-400 text-xs font-semibold uppercase tracking-wider text-left">
+                                    <th class="pb-3">Chore</th>
+                                    <th class="pb-3 text-center w-16">Value</th>
+                                    <th class="pb-3 text-center">M</th>
+                                    <th class="pb-3 text-center">T</th>
+                                    <th class="pb-3 text-center">W</th>
+                                    <th class="pb-3 text-center">T</th>
+                                    <th class="pb-3 text-center">F</th>
+                                    <th class="pb-3 text-center">S</th>
+                                    <th class="pb-3 text-center">S</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-850/50">
+                                <tr class="hover:bg-slate-850/30">
+                                    <td class="py-3 font-bold text-slate-200 text-sm">🧹 Clean Room</td>
+                                    <td class="py-3 text-center text-xs font-bold text-slate-400">$0.25</td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-room-0" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-room-1" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-room-2" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-room-3" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-room-4" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-room-5" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-room-6" onclick="ledgerCheckboxUpdated()"></td>
+                                </tr>
+                                <tr class="hover:bg-slate-850/30">
+                                    <td class="py-3 font-bold text-slate-200 text-sm">🍖 Feeding Rio (AM - 7:00am)</td>
+                                    <td class="py-3 text-center text-xs font-bold text-slate-400">$0.25</td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedam-0" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedam-1" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedam-2" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedam-3" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedam-4" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedam-5" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedam-6" onclick="ledgerCheckboxUpdated()"></td>
+                                </tr>
+                                <tr class="hover:bg-slate-850/30">
+                                    <td class="py-3 font-bold text-slate-200 text-sm">🍖 Feeding Rio (PM - 5:00pm)</td>
+                                    <td class="py-3 text-center text-xs font-bold text-slate-400">$0.25</td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedpm-0" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedpm-1" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedpm-2" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedpm-3" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedpm-4" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedpm-5" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-feedpm-6" onclick="ledgerCheckboxUpdated()"></td>
+                                </tr>
+                                <tr class="hover:bg-slate-850/30">
+                                    <td class="py-3 font-bold text-slate-200 text-sm">🐕 Rio Walk (AM - 7:00am)</td>
+                                    <td class="py-3 text-center text-xs font-bold text-slate-400">$0.50</td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkam-0" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkam-1" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkam-2" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkam-3" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkam-4" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkam-5" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkam-6" onclick="ledgerCheckboxUpdated()"></td>
+                                </tr>
+                                <tr class="hover:bg-slate-850/30">
+                                    <td class="py-3 font-bold text-slate-200 text-sm">🐕 Rio Walk (PM - 5:00pm)</td>
+                                    <td class="py-3 text-center text-xs font-bold text-slate-400">$0.50</td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkpm-0" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkpm-1" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkpm-2" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkpm-3" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkpm-4" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkpm-5" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-walkpm-6" onclick="ledgerCheckboxUpdated()"></td>
+                                </tr>
+                                <tr class="hover:bg-slate-850/30">
+                                    <td class="py-3 font-bold text-slate-200 text-sm">🐱 Oscar Litter Bin</td>
+                                    <td class="py-3 text-center text-xs font-bold text-slate-400">$0.25</td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-litter-0" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-litter-1" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-litter-2" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-litter-3" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-litter-4" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-litter-5" onclick="ledgerCheckboxUpdated()"></td>
+                                    <td class="py-3"><input type="checkbox" class="hub-checkbox mx-auto" id="ledger-litter-6" onclick="ledgerCheckboxUpdated()"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Weekly Chores Options List -->
+                <section class="glass-card rounded-3xl p-4 md:p-6 shadow-xl space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h2 class="text-base md:text-lg font-bold text-cyan-400 flex items-center gap-2">
+                            <span class="material-icons">assignment_turned_in</span> Weekly Jobs
+                        </h2>
+                        <span class="text-[10px] bg-cyan-500/10 text-cyan-300 px-2.5 py-1 rounded-full font-semibold border border-cyan-500/20">Once a Week</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <label class="flex items-center justify-between p-3.5 rounded-xl bg-slate-900/40 border border-slate-800 hover:border-slate-700 cursor-pointer transition select-none">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" class="hub-checkbox" id="ledger-garbage-thu" onclick="updateMoneyCalculations()">
+                                <div class="text-left">
+                                    <span class="font-semibold text-slate-200 text-xs md:text-sm block">🗑️ Garbage Thursday</span>
+                                    <span class="text-[10px] text-slate-400 font-mono">Time: 5:30 PM (Thu)</span>
+                                </div>
+                            </div>
+                            <span class="text-emerald-400 font-extrabold text-xs md:text-sm">$2.25</span>
+                        </label>
+                        <label class="flex items-center justify-between p-3.5 rounded-xl bg-slate-900/40 border border-slate-800 hover:border-slate-700 cursor-pointer transition select-none">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" class="hub-checkbox" id="ledger-garbage-curb" onclick="updateMoneyCalculations()">
+                                <div class="text-left">
+                                    <span class="font-semibold text-slate-200 text-xs md:text-sm block">🚚 Garbage to Curb</span>
+                                    <span class="text-[10px] text-slate-400 font-mono">Time: 5:30 PM (Thu)</span>
+                                </div>
+                            </div>
+                            <span class="text-emerald-400 font-extrabold text-xs md:text-sm">$2.00</span>
+                        </label>
+                        <label class="flex items-center justify-between p-3.5 rounded-xl bg-slate-900/40 border border-slate-800 hover:border-slate-700 cursor-pointer transition select-none">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" class="hub-checkbox" id="ledger-laundry" onclick="updateMoneyCalculations()">
+                                <div class="text-left">
+                                    <span class="font-semibold text-slate-200 text-xs md:text-sm block">👕 Fold Laundry</span>
+                                    <span class="text-[10px] text-slate-400 font-mono">Time: 5:30 PM</span>
+                                </div>
+                            </div>
+                            <span class="text-emerald-400 font-extrabold text-xs md:text-sm">$6.00</span>
+                        </label>
+                        <label class="flex items-center justify-between p-3.5 rounded-xl bg-slate-900/40 border border-slate-800 hover:border-slate-700 cursor-pointer transition select-none">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" class="hub-checkbox" id="ledger-vacuum" onclick="updateMoneyCalculations()">
+                                <div class="text-left">
+                                    <span class="font-semibold text-slate-200 text-xs md:text-sm block">🔌 Vacuum Upstairs</span>
+                                    <span class="text-[10px] text-slate-400 font-mono">Time: 5:30 PM</span>
+                                </div>
+                            </div>
+                            <span class="text-emerald-400 font-extrabold text-xs md:text-sm">$5.00</span>
+                        </label>
+                        <label class="flex items-center justify-between p-3.5 rounded-xl bg-slate-900/40 border border-slate-800 hover:border-slate-700 cursor-pointer transition select-none md:col-span-2">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" class="hub-checkbox" id="ledger-washrooms" onclick="updateMoneyCalculations()">
+                                <div class="text-left">
+                                    <span class="font-semibold text-slate-200 text-xs md:text-sm block">🧽 Cleaning Washrooms</span>
+                                    <span class="text-[10px] text-slate-400 font-mono">Time: 5:30 PM</span>
+                                </div>
+                            </div>
+                            <span class="text-emerald-400 font-extrabold text-xs md:text-sm">$11.00</span>
+                        </label>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Budget Split calculations and visual jars -->
+            <div class="space-y-6">
+                <section class="glass-card rounded-3xl p-6 shadow-xl space-y-6">
+                    <h2 class="text-base md:text-lg font-bold flex items-center gap-2 text-emerald-400 border-b border-slate-800 pb-3">
+                        <span class="material-icons">analytics</span> Weekly Split
+                    </h2>
+
+                    <div class="text-center py-2 space-y-3">
+                        <div class="text-xs font-semibold uppercase tracking-widest text-slate-400">Total Earned</div>
+                        <div class="text-4xl md:text-5xl font-black tracking-tight text-white flex justify-center items-baseline">
+                            $<span id="total-val">0.00</span>
+                            <span class="text-sm font-medium text-slate-500 ml-1">/ $35.00</span>
+                        </div>
+
+                        <!-- Progress Bar Container -->
+                        <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden mt-3 relative">
+                            <div id="p-bar" class="bg-gradient-to-r from-indigo-500 via-cyan-500 to-emerald-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div id="p-bar-cap-toast" class="text-xs text-amber-300 font-bold hidden animate-bounce">
+                            🏆 Weekly Cap Reached ($35.00 Limit)
+                        </div>
+                    </div>
+
+                    <!-- Budget Split Jars -->
+                    <div class="space-y-3">
+                        <div class="bg-indigo-950/40 border border-indigo-500/20 rounded-xl p-4 flex justify-between items-center">
+                            <div>
+                                <span class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest block">💸 Spend Pocket (50%)</span>
+                                <span class="text-slate-400 text-xs">For immediate goals</span>
+                            </div>
+                            <div class="text-xl font-black text-indigo-200">$<span id="spend-val">0.00</span></div>
+                        </div>
+
+                        <div class="bg-emerald-950/40 border border-emerald-500/20 rounded-xl p-4 flex justify-between items-center">
+                            <div>
+                                <span class="text-[10px] font-bold text-emerald-300 uppercase tracking-widest block">🏦 Savings Vault (50%)</span>
+                                <span class="text-slate-400 text-xs">Locked for long-term target savings</span>
+                            </div>
+                            <div class="text-xl font-black text-emerald-200">$<span id="save-val">0.00</span></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Interactive Goal Getter Progress Estimator -->
+                <section class="glass-card rounded-3xl p-6 shadow-xl space-y-4">
+                    <h2 class="text-base md:text-lg font-bold flex items-center gap-2 text-amber-400 border-b border-slate-800 pb-3">
+                        <span class="material-icons">track_changes</span> Goal Calculator
+                    </h2>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">What are you saving for?</label>
+                            <input id="goal-name-input" type="text" placeholder="e.g. Socks, iPhone, Binder..." oninput="calculateWeeksNeeded()" class="w-full px-3 py-2 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-100 placeholder-slate-500 font-medium text-xs focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Cost of Goal ($)</label>
+                            <input id="goal-price-input" type="number" step="0.01" placeholder="0.00" oninput="calculateWeeksNeeded()" class="w-full px-3 py-2 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-100 placeholder-slate-500 font-medium text-xs focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Using which wallet?</label>
+                            <select id="goal-fund-select" onchange="calculateWeeksNeeded()" class="w-full px-3 py-2 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-100 font-medium text-xs focus:outline-none focus:border-indigo-500 transition">
+                                <option value="spend">💸 Spend Pocket ($0.00)</option>
+                                <option value="save" selected>🏦 Savings Vault ($0.00)</option>
+                                <option value="total">💰 Both Combined ($0.00)</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Goal Calculator Output Box -->
+                        <div id="goal-estimate-box" class="bg-indigo-950/20 border border-indigo-500/20 rounded-xl p-4 text-center hidden">
+                            <p class="text-slate-300 text-xs">Time needed to buy <span id="goal-text-display" class="font-extrabold text-amber-400">Target</span>:</p>
+                            <h3 class="text-xl font-black text-emerald-400 mt-1"><span id="goal-weeks-display">0</span> Weeks</h3>
+                            <p class="text-[9px] text-slate-500 mt-1">Estimations are based on your current weekly chore balance rates.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Tab 3: Soccer Academy Drills -->
+        <div id="tab-soccer" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-3xl p-4 md:p-6 shadow-xl space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-base md:text-lg font-bold text-indigo-400 flex items-center gap-2">
+                            <span class="material-icons">sports_soccer</span> DeRo TFC Academy Solo Program
+                        </h2>
+                        <p class="text-xs text-slate-400">Week-by-week progressive plan customized for Caden's speed and stamina.</p>
+                    </div>
+                    <!-- Week Selection (Dynamic program view) -->
+                    <div class="flex bg-slate-900/80 p-1 rounded-xl border border-slate-800 self-start">
+                        <button onclick="selectSoccerWeek(1)" class="week-soccer-btn px-4 py-2 text-xs font-bold rounded-lg transition-all" id="week-soccer-1">Week 1</button>
+                        <button onclick="selectSoccerWeek(2)" class="week-soccer-btn px-4 py-2 text-xs font-bold rounded-lg transition-all" id="week-soccer-2">Week 2</button>
+                        <button onclick="selectSoccerWeek(3)" class="week-soccer-btn px-4 py-2 text-xs font-bold rounded-lg transition-all" id="week-soccer-3">Week 3</button>
+                        <button onclick="selectSoccerWeek(4)" class="week-soccer-btn px-4 py-2 text-xs font-bold rounded-lg transition-all" id="week-soccer-4">Week 4</button>
+                    </div>
+                </div>
+
+                <!-- 4-Week Regimen Displays -->
+                <div id="week-regimen-box" class="space-y-6">
+                    <!-- Filled dynamically by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 4: Fitness & Nutrition -->
+        <div id="tab-fitness" class="tab-content hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Strength Circuit -->
+            <div class="lg:col-span-2 space-y-6">
+                <section class="glass-card rounded-3xl p-4 md:p-6 shadow-xl space-y-4">
+                    <div class="border-b border-slate-800 pb-3">
+                        <h2 class="text-base md:text-lg font-bold text-amber-400 flex items-center gap-2">
+                            <span class="material-icons">fitness_center</span> The Power-Builder Circuit
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Bodyweight movements for an athlete to build strength safely (Perform at 5:15 PM on Mon, Thu, Sat).</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-slate-900/60 p-4 border border-slate-800 rounded-xl space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Exercise 1: Push-ups</span>
+                                <span class="text-xs font-semibold text-slate-400">Chest, Arms, Core</span>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">3 Sets of 8-12 reps. Keep body in a straight line, chest to floor. Perform on knees if standard is too difficult.</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 border border-slate-800 rounded-xl space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Exercise 2: Goblet Squats</span>
+                                <span class="text-xs font-semibold text-slate-400">Quadriceps, Glutes</span>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">3 Sets of 12-15 reps. Drop hips low as if sitting in a chair. Keep back flat and weight on heels.</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 border border-slate-800 rounded-xl space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Exercise 3: Alternating Lunges</span>
+                                <span class="text-xs font-semibold text-slate-400">Hamstrings, Balance</span>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">3 Sets of 10 reps per leg. Step forward and drop back knee just above floor. Vital for explosive speed.</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 border border-slate-800 rounded-xl space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Exercise 4: Plank-to-Pushup</span>
+                                <span class="text-xs font-semibold text-slate-400">Core &amp; Shoulder Stability</span>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">3 Sets of 45 seconds. Start in elbow plank, press up one hand at a time into high pushup, return down.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Pro Nutrition Column -->
+            <div class="space-y-6">
+                <section class="glass-card rounded-3xl p-6 shadow-xl space-y-4">
+                    <div class="border-b border-slate-800 pb-2">
+                        <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Pro Player Fueling Plan</h3>
+                        <p class="text-[10px] text-slate-400 mt-0.5">High-protein, calorie-surplus nutrition designed to help skinny athletes build muscle.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="bg-slate-900/40 p-3.5 border border-slate-800 rounded-xl space-y-1">
+                            <strong class="text-xs text-emerald-300 block uppercase tracking-wide">🥛 The 4-Glass Milk Protocol</strong>
+                            <p class="text-xs text-slate-400 leading-relaxed">Drink one 250ml glass of milk (or soy milk) at 7:00 AM, 12:00 PM, 3:30 PM, and 8:30 PM. Adds easy, safe calories and proteins!</p>
+                        </div>
+                        <div class="bg-slate-900/40 p-3.5 border border-slate-800 rounded-xl space-y-1">
+                            <strong class="text-xs text-emerald-300 block uppercase tracking-wide">🥜 Calorie Booster Snack (3:30 PM)</strong>
+                            <p class="text-xs text-slate-400 leading-relaxed">Eat sliced apples or bananas loaded with 2 tablespoons of peanut butter between school and soccer training.</p>
+                        </div>
+                        <div class="bg-slate-900/40 p-3.5 border border-slate-800 rounded-xl space-y-1">
+                            <strong class="text-xs text-emerald-300 block uppercase tracking-wide">🍳 Triple Protein Goal</strong>
+                            <p class="text-xs text-slate-400 leading-relaxed">Aim for three protein sources a day: eggs at breakfast, chicken/beef at lunch, and a high-protein peanut butter toast or turkey roll-up at 8:30 PM.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Tab 5: Proposal to Dad & Active Trial Tracker -->
+        <div id="tab-dad" class="tab-content hidden space-y-6 max-w-3xl mx-auto">
+            <section class="glass-card rounded-3xl p-6 md:p-8 shadow-xl space-y-6">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-lg md:text-xl font-black text-white">🤝 My Joint Junior Card Proposal</h2>
+                        <p class="text-xs text-slate-400 mt-1">Ready to present to Dad? Check off your trials and register your agreement here.</p>
+                    </div>
+                    <span class="text-xs bg-indigo-500/10 text-indigo-300 px-3 py-1.5 rounded-full font-bold border border-indigo-500/20">4-Week Trial Tracker</span>
+                </div>
+
+                <!-- 4-Week Trial Tracker Checkbox Block -->
+                <div class="bg-slate-950/60 p-4 border border-slate-850 rounded-2xl space-y-3">
+                    <h4 class="font-bold text-xs text-indigo-400 uppercase tracking-widest">📋 Active Trial Weeks Completed</h4>
+                    <div class="space-y-2 text-xs">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="trial-week1" onchange="saveProgressState()" class="hub-checkbox w-6 h-6">
+                            <span>📅 Week 1 Chores tracked perfectly (No reminders needed!)</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="trial-week2" onchange="saveProgressState()" class="hub-checkbox w-6 h-6">
+                            <span>📅 Week 2 Chores tracked perfectly (No reminders needed!)</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="trial-week3" onchange="saveProgressState()" class="hub-checkbox w-6 h-6">
+                            <span>📅 Week 3 Chores tracked perfectly (No reminders needed!)</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="trial-week4" onchange="saveProgressState()" class="hub-checkbox w-6 h-6">
+                            <span>📅 Week 4 Completed! (Time to activate your Debit Card)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Written Proposal Draft Box -->
+                <div class="border-t border-slate-800/80 pt-6 space-y-4 text-xs text-slate-300 leading-relaxed">
+                    <h3 class="font-bold text-sm text-slate-200">Written Proposal (Drafted for Dad)</h3>
+                    <div class="bg-slate-950/40 p-4 border border-slate-850 rounded-2xl space-y-3 font-medium">
+                        <p><strong>To:</strong> Dad<br><strong>From:</strong> Your Son (Caden)<br><strong>Subject:</strong> Request for a Joint Junior Debit Card Trial Period</p>
+                        <p>Dad, I respect your opinion that managing money requires high responsibility. Instead of just asking you to change your mind, I studied <strong>Financial Literacy</strong> to design a smart money management system.</p>
+                        <p>I have built a physical wall chart to track my daily routines and weekly jobs, capping my weekly maximum earnings at $35.00. I am strictly dividing my money 50/50: half into a "Spend Bucket" (Checking) and half into a "Savings Vault" (Savings Account).</p>
+                        <p>I am requesting a <strong>4-week trial period</strong>. If I track my chores perfectly for 4 weeks straight, we will follow this agreement:</p>
+                        <ul class="list-disc list-inside space-y-2 pl-2">
+                            <li><strong>The Banking System:</strong> During these 4 weeks, we will use the banking system at home. I will physically split my money 50/50 into "Spend" and "Save" accounts under your control.</li>
+                            <li><strong>Responsibility Target:</strong> If I track my chores and manage my money perfectly for 4 weeks straight, you agree to let me use my Junior Debit Card linked to my accounts so I can get a little more control of my accounts.</li>
+                        </ul>
+                        <p class="font-semibold text-indigo-400">Let's sign below, print my chart, and get started next week!</p>
+                        <p class="italic text-slate-500">P.S. If you want to change anything just let me know. For example, if you want me to use envelopes instead of the banking system.</p>
+                    </div>
+                </div>
+
+                <!-- Digital Signatures Pad System -->
+                <div class="border-t border-slate-800 pt-6 space-y-4">
+                    <h4 class="font-bold text-xs text-slate-400 uppercase tracking-wider">🤝 Formal Agreement Sign-off</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-950/40 border border-slate-800 p-4 rounded-xl flex flex-col space-y-2">
+                            <span class="text-[10px] font-bold text-indigo-300 uppercase">Caden's Digital Signature</span>
+                            <input type="text" id="sig-caden" oninput="saveProgressState()" placeholder="Type Caden here to sign..." class="px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-100 text-xs focus:outline-none focus:border-indigo-500 font-mono italic">
+                        </div>
+                        <div class="bg-slate-950/40 border border-slate-800 p-4 rounded-xl flex flex-col space-y-2">
+                            <span class="text-[10px] font-bold text-indigo-300 uppercase">Dad's Digital Signature</span>
+                            <input type="text" id="sig-dad" oninput="saveProgressState()" placeholder="Type Dad here to sign..." class="px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-100 text-xs focus:outline-none focus:border-indigo-500 font-mono italic">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tab 6: Interactive Money Guides -->
+        <div id="tab-guides" class="tab-content hidden space-y-6 max-w-3xl mx-auto">
+            <div class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <span class="text-xs text-slate-300 font-medium">Select a guide to read right on your dashboard:</span>
+                <div class="flex gap-2 w-full sm:w-auto overflow-x-auto">
+                    <button onclick="switchGuide('lit')" id="btn-guide-lit" class="flex-1 sm:flex-initial bg-indigo-600 text-white font-bold text-xs px-4 py-2 rounded-lg transition whitespace-nowrap">🎓 Financial Literacy</button>
+                    <button onclick="switchGuide('envelope')" id="btn-guide-envelope" class="flex-1 sm:flex-initial bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 font-bold text-xs px-4 py-2 rounded-lg transition whitespace-nowrap">🪙 Meantime Envelope</button>
+                    <button onclick="switchGuide('single-drawer')" id="btn-guide-single-drawer" class="flex-1 sm:flex-initial bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 font-bold text-xs px-4 py-2 rounded-lg transition whitespace-nowrap">🚪 Single Drawer Trick</button>
+                </div>
+            </div>
+
+            <!-- Guide Box 1: Financial Literacy -->
+            <article id="guide-box-lit" class="glass-card rounded-3xl p-6 md:p-8 shadow-xl text-xs md:text-sm leading-relaxed text-slate-300 space-y-4">
+                <h2 class="text-lg font-bold text-indigo-400 border-b border-slate-800 pb-2 flex items-center gap-2">
+                    <span class="material-icons">school</span> The Ultimate Junior Financial Literacy Guide
+                </h2>
+                <h3 class="font-bold text-slate-200 mt-2">Chapter 1: Income vs. Expenses</h3>
+                <p>In the financial world, money only moves in two directions: <strong>In</strong> (Income) and <strong>Out</strong> (Expenses).</p>
+                <ul class="list-disc list-inside pl-2 space-y-1 text-slate-400 text-xs">
+                    <li><strong>Active Income:</strong> Money you work for directly (like vacuuming upstairs).</li>
+                    <li><strong>Passive Income:</strong> Money that works for you (like the interest paid by a bank savings account).</li>
+                    <li><strong>Expenses:</strong> Any money you spend to buy items (like card booster packs).</li>
+                </ul>
+                <h3 class="font-bold text-slate-200 mt-4">Chapter 2: Needs vs. Wants</h3>
+                <p>Before any purchase, filter the item: <strong>Needs</strong> are absolute requirements to stay healthy (healthy food, safety). <strong>Wants</strong> are items that are fun, but you can live comfortably without (video games, soccer cards).</p>
+                <h3 class="font-bold text-slate-200 mt-4">Chapter 3: The 50/50 Blueprint</h3>
+                <p>By splitting every single dollar in half, you build a lifetime safety cushion while still allowing yourself to buy and enjoy smaller immediate goals.</p>
+            </article>
+
+            <!-- Guide Box 2: Meantime Envelope Method -->
+            <article id="guide-box-envelope" class="hidden glass-card rounded-3xl p-6 md:p-8 shadow-xl text-xs md:text-sm leading-relaxed text-slate-300 space-y-4">
+                <h2 class="text-lg font-bold text-indigo-400 border-b border-slate-800 pb-2 flex items-center gap-2">
+                    <span class="material-icons">local_post_office</span> The Meantime Envelope System
+                </h2>
+                <p>Since you don't have a bank card in your hands yet, find two separate paper envelopes (or glass jars) and label them:</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-3">
+                    <div class="bg-indigo-950/40 border border-indigo-500/20 rounded-xl p-3.5">
+                        <strong class="text-indigo-300 text-xs block uppercase mb-1">Envelope A: Spend (50%)</strong>
+                        <p class="text-[11px] text-slate-400">Carry this cash with you when going to the store for soccer cards or movies.</p>
+                    </div>
+                    <div class="bg-emerald-950/40 border border-emerald-500/20 rounded-xl p-3.5">
+                        <strong class="text-emerald-300 text-xs block uppercase mb-1">Envelope B: Savings (50%)</strong>
+                        <p class="text-[11px] text-slate-400">Keep this envelope tucked safely away in your room. This money is locked!</p>
+                    </div>
+                </div>
+                <h3 class="font-bold text-slate-200 mt-4">🔄 The Bank Deposit Trick</h3>
+                <p>Once your physical Savings Envelope reaches a milestone (like $10 or $20), hand it to your dad and ask him to deposit it into your actual account. This proves your financial maturity instantly!</p>
+            </article>
+
+            <!-- Guide Box 3: Single Drawer Trick -->
+            <article id="guide-box-single-drawer" class="hidden glass-card rounded-3xl p-6 md:p-8 shadow-xl text-xs md:text-sm leading-relaxed text-slate-300 space-y-4">
+                <h2 class="text-lg font-bold text-indigo-400 border-b border-slate-800 pb-2 flex items-center gap-2">
+                    <span class="material-icons">view_sidebar</span> One Bank Account: The Single-Drawer Trick
+                </h2>
+                <p>If you only have one chequing account and NO secondary savings folder in your bank yet, you can use <strong>Ledger Separation</strong>.</p>
+                <p>Imagine your single bank account is a drawer, but your digital Chore Hub acts as a solid cardboard divider right down the middle. Even though the bank holds the total sum in one slot, your tracker keeps a strict record of what part is allowed to be spent, and what part is strictly locked away.</p>
+            </article>
+        </div>
+
+        <!-- Tab 7: High-Fidelity Printable Wall Chart -->
+        <div id="tab-print" class="tab-content hidden space-y-6">
+            <div class="no-print bg-slate-900/60 p-4 rounded-xl border border-slate-700/50 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <p class="text-xs text-slate-300 flex items-center gap-2"><span class="material-icons text-indigo-400 text-sm">print_disabled</span> Connecting to a printer? Click Print Chart below to output on paper!</p>
+                <button onclick="triggerSystemPrint()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm">
+                    <span class="material-icons text-base">print</span> Print My Wall Chart
+                </button>
+            </div>
+
+            <!-- Printing Helper Troubleshooting Modal -->
+            <div id="print-trouble-box" class="no-print bg-amber-950/30 border border-amber-500/30 rounded-2xl p-4 text-slate-300 text-xs leading-relaxed space-y-2">
+                <h4 class="font-bold text-amber-400 flex items-center gap-1.5"><span class="material-icons text-sm font-bold">warning</span> Is your browser blocking the printer pop-up?</h4>
+                <p>Because these templates run inside restricted third-party environments, printing can sometimes be disabled. The easiest solution is to copy this code block into a file named <strong class="bg-slate-950 text-indigo-300 px-1 py-0.5 rounded">chart.html</strong> on your computer desktop, double-click it, and print directly!</p>
+            </div>
+
+            <!-- Standardized Printable Visual Asset -->
+            <div class="bg-white text-slate-800 p-6 md:p-8 rounded-3xl max-w-3xl mx-auto border border-slate-200 shadow-md">
+                <div class="text-center border-b-2 border-double border-slate-200 pb-4 mb-6">
+                    <h1 class="text-xl md:text-2xl font-black text-slate-950 tracking-tight">MY WEEKLY CHORE CHART</h1>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Goal Split: 50% Spend Pocket &amp; 50% Savings Vault • Max Weekly Limit: $35.00</p>
+                </div>
+
+                <div class="space-y-6 text-xs font-medium text-slate-700">
+                    <div>
+                        <h3 class="font-bold text-indigo-700 uppercase tracking-widest mb-2">📅 Daily Routines</h3>
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-500">
+                                    <th class="py-2 px-3">Task Description</th>
+                                    <th class="py-2 px-3 text-center w-16">Value</th>
+                                    <th class="py-2 px-1 text-center">M</th>
+                                    <th class="py-2 px-1 text-center">T</th>
+                                    <th class="py-2 px-1 text-center">W</th>
+                                    <th class="py-2 px-1 text-center">T</th>
+                                    <th class="py-2 px-1 text-center">F</th>
+                                    <th class="py-2 px-1 text-center">S</th>
+                                    <th class="py-2 px-1 text-center">S</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+                                <tr>
+                                    <td class="py-2.5 px-3">Clean Room</td>
+                                    <td class="py-2.5 px-3 text-center text-indigo-600 font-bold">$0.25</td>
+                                    <td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2.5 px-3">Feeding Rio (AM)</td>
+                                    <td class="py-2.5 px-3 text-center text-indigo-600 font-bold">$0.25</td>
+                                    <td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2.5 px-3">Feeding Rio (PM)</td>
+                                    <td class="py-2.5 px-3 text-center text-indigo-600 font-bold">$0.25</td>
+                                    <td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2.5 px-3">Rio Walk (AM)</td>
+                                    <td class="py-2.5 px-3 text-center text-indigo-600 font-bold">$0.50</td>
+                                    <td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2.5 px-3">Rio Walk (PM)</td>
+                                    <td class="py-2.5 px-3 text-center text-indigo-600 font-bold">$0.50</td>
+                                    <td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2.5 px-3">Oscar Litter Bin</td>
+                                    <td class="py-2.5 px-3 text-center text-indigo-600 font-bold">$0.25</td>
+                                    <td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td><td><div class="print-box"></div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-cyan-700 uppercase tracking-widest mb-2">🧹 Weekly Jobs</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div class="flex items-center justify-between p-2.5 border border-slate-200 rounded-xl">
+                                <span class="flex items-center gap-2"><span class="print-box m-0"></span> Garbage on Thursday</span>
+                                <span class="text-indigo-600 font-bold">$2.25</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 border border-slate-200 rounded-xl">
+                                <span class="flex items-center gap-2"><span class="print-box m-0"></span> Garbage to Curb</span>
+                                <span class="text-indigo-600 font-bold">$2.00</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 border border-slate-200 rounded-xl">
+                                <span class="flex items-center gap-2"><span class="print-box m-0"></span> Fold &amp; Put Away Laundry</span>
+                                <span class="text-indigo-600 font-bold">$6.00</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 border border-slate-200 rounded-xl">
+                                <span class="flex items-center gap-2"><span class="print-box m-0"></span> Vacuum upstairs carpet</span>
+                                <span class="text-indigo-600 font-bold">$5.00</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 border border-slate-200 rounded-xl sm:col-span-2">
+                                <span class="flex items-center gap-2"><span class="print-box m-0"></span> Cleaning washrooms</span>
+                                <span class="text-indigo-600 font-bold">$11.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payday Summary Jars Block -->
+                    <div class="border-t border-slate-200 pt-4 mt-4 grid grid-cols-3 gap-2 text-center">
+                        <div class="border-2 border-dashed border-slate-200 rounded-xl p-3 flex flex-col justify-between h-20">
+                            <span class="text-[9px] font-bold text-slate-500 uppercase">Total Earned</span>
+                            <span class="text-slate-400 text-[9px]">(Max $35.00)</span>
+                        </div>
+                        <div class="border-2 border-indigo-500 bg-indigo-50/20 rounded-xl p-3 flex flex-col justify-between h-20">
+                            <span class="text-[9px] font-bold text-indigo-700 uppercase">Spend Pocket (50%)</span>
+                            <span class="text-indigo-500 text-[9px]">(Fun Wants)</span>
+                        </div>
+                        <div class="border-2 border-emerald-500 bg-emerald-50/20 rounded-xl p-3 flex flex-col justify-between h-20">
+                            <span class="text-[9px] font-bold text-emerald-700 uppercase">Savings Vault (50%)</span>
+                            <span class="text-emerald-500 text-[9px]">(Locked)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Instruction Dialog: Mobility & Core -->
+    <div id="mobility-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-filter backdrop-blur-md flex items-center justify-center p-4 z-50">
+        <div class="glass-card rounded-3xl max-w-md w-full p-6 space-y-4 border border-slate-800 shadow-2xl text-left">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
+                <h3 class="text-base font-extrabold text-indigo-400 flex items-center gap-2">
+                    <span class="material-icons">directions_run</span> Morning Mobility &amp; Core Activation
+                </h3>
+                <button onclick="closeInfoModal('mobility')" class="text-slate-400 hover:text-white"><span class="material-icons">close</span></button>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Mobility wakes up your muscles and keeps you flexible so you don't get hurt. Core activation fires up your abs and hips so you have more balance when shield-dribbling. Perform these simple movements:
+            </p>
+            <div class="space-y-3">
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800 space-y-1">
+                    <strong class="text-xs text-indigo-300 block uppercase tracking-wide">🧘 1. Spine Waker (Cat-Cow Stretch)</strong>
+                    <p class="text-[11px] text-slate-400">Get on hands and knees. Arch your back up like a cat, then arch it down while looking up. Do this slowly 5 times.</p>
+                </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800 space-y-1">
+                    <strong class="text-xs text-indigo-300 block uppercase tracking-wide">🐜 2. Core Balancing deadbugs</strong>
+                    <p class="text-[11px] text-slate-400">Lie flat on your back with legs and arms straight up in the air. Slowly lower your right arm and left leg to the floor, bring them back, and swap. Do 5 reps each side.</p>
+                </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800 space-y-1">
+                    <strong class="text-xs text-indigo-300 block uppercase tracking-wide">🪵 3. Abdominals Activation (The Plank)</strong>
+                    <p class="text-[11px] text-slate-400">Hold a standard elbow plank for 30 to 45 seconds. Squeeze your stomach tight and keep your body perfectly straight like a soccer field line.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instruction Dialog: Visual Brain Training -->
+    <div id="visual-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-filter backdrop-blur-md flex items-center justify-center p-4 z-50">
+        <div class="glass-card rounded-3xl max-w-md w-full p-6 space-y-4 border border-slate-800 shadow-2xl text-left">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
+                <h3 class="text-base font-extrabold text-indigo-400 flex items-center gap-2">
+                    <span class="material-icons">psychology</span> Daily Visual Scanning Workout
+                </h3>
+                <button onclick="closeInfoModal('visual')" class="text-slate-400 hover:text-white"><span class="material-icons">close</span></button>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Elite midfielders like Kevin De Bruyne scan their surroundings every 2 seconds. This drill trains your eyes to spot teammates and opponents before receiving the soccer ball.
+            </p>
+            <div class="space-y-3">
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800 space-y-1">
+                    <strong class="text-xs text-indigo-300 block uppercase tracking-wide">🎯 Wall Dribble &amp; Glance (5-8 Mins)</strong>
+                    <p class="text-[11px] text-slate-400">Pass a soccer ball against a wall in your basement or backyard. Right before you receive it back, quickly snap your head to look behind your shoulder, then turn and shield the ball.</p>
+                </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800 space-y-1">
+                    <strong class="text-xs text-indigo-300 block uppercase tracking-wide">👀 Rapid Tracking</strong>
+                    <p class="text-[11px] text-slate-400">Sit upright. Without moving your head, look all the way up, down, left, then right. Do this in circles for 1 minute to stretch and warm up your eye muscles.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal for Reset -->
+    <div id="reset-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-filter backdrop-blur-md flex items-center justify-center p-4 z-50">
+        <div class="glass-card rounded-3xl max-w-sm w-full p-6 text-center space-y-4 border border-slate-700 shadow-2xl">
+            <div class="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto">
+                <span class="material-icons">warning</span>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-base font-bold text-white">Reset All Progress?</h3>
+                <p class="text-xs text-slate-400">This will clear your daily checkboxes, ledger balances, and custom progress saves. You cannot undo this action.</p>
+            </div>
+            <div class="flex gap-2.5 pt-2">
+                <button onclick="closeResetModal()" class="flex-1 py-2 px-3 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition font-bold">
+                    Cancel
+                </button>
+                <button onclick="executeSystemReset()" class="flex-1 py-2 px-3 text-xs rounded-xl bg-rose-600 hover:bg-rose-700 text-white transition font-bold">
+                    Yes, Reset All
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 glass-card border-slate-700 rounded-2xl p-4 flex items-center gap-3 translate-y-24 opacity-0 transition-all duration-300 shadow-2xl z-50 select-none pointer-events-none">
+        <span class="text-xl">✅</span>
+        <div>
+            <h4 class="font-bold text-sm text-white">Progress Saved</h4>
+            <p class="text-xs text-slate-400">All chores, schedules, and calculations synced.</p>
+        </div>
+    </div>
+
+    <script>
+        const CHORE_PRICES = {
+            'room': 0.25,
+            'feedam': 0.25,
+            'feedpm': 0.25,
+            'walkam': 0.50,
+            'walkpm': 0.50,
+            'litter': 0.25,
+            'garbage-thu': 2.25,
+            'garbage-curb': 2.00,
+            'laundry': 6.00,
+            'vacuum': 5.00,
+            'washrooms': 11.00
+        };
+
+        const CAP_MAX = 35.00;
+        
+        let currentDayIdx = new Date().getDay(); 
+        currentDayIdx = currentDayIdx === 0 ? 6 : currentDayIdx - 1; 
+        
+        let currentWeekNum = 4; // Default Week 4 Active
+        let currentSoccerWeekNum = 1;
+
+        const WEEK_DATE_LABELS = {
+            1: "June 29 - July 5, 2026",
+            2: "July 6 - July 12, 2026",
+            3: "July 13 - July 19, 2026",
+            4: "July 20 - July 26, 2026"
+        };
+
+        const CALENDAR_WEEKS_DATA = {
+            1: { 
+                days: {
+                    0: [],
+                    1: [{ time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
+                    2: [{ time: "All Day", task: "🍁 Canada Day Holiday", cat: "other" }],
+                    3: [{ time: "05:00 PM", task: "🐿️ Can't Birthday - Flying Squirrel", cat: "caden" }, { time: "06:00 PM", task: "🥍 Lacrosse Match", cat: "caden" }],
+                    4: [{ time: "12:45 PM", task: "🩺 Video Appointment (Dr. Al Naser)", cat: "caden" }, { time: "06:45 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
+                    5: [],
+                    6: [{ time: "09:00 AM", task: "⚽ Team Training Turf (DeRo)", cat: "dero" }, { time: "10:00 AM", task: "🥍 Lacrosse", cat: "caden" }, { time: "01:30 PM", task: "🎉 Joanne's End of School Party", cat: "caden" }]
+                }
+            },
+            2: { 
+                days: {
+                    0: [{ time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden" }],
+                    1: [{ time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden" }, { time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
+                    2: [{ time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden" }, { time: "07:00 PM", task: "⚽ GAME: Kawartha Inferno vs DeRo TFC Black", cat: "dero" }],
+                    3: [{ time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden" }, { time: "06:00 PM", task: "🥍 Lacrosse Match", cat: "caden" }],
+                    4: [{ time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden" }, { time: "06:45 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
+                    5: [],
+                    6: [{ time: "09:00 AM", task: "⚽ Team Training Turf (DeRo)", cat: "dero" }]
+                }
+            },
+            3: { 
+                days: {
+                    0: [{ time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden" }],
+                    1: [{ time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden" }, { time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
+                    2: [{ time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden" }, { time: "07:00 PM", task: "⚽ GAME: DeRo TFC Black vs Northumberland", cat: "dero" }],
+                    3: [{ time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden" }, { time: "06:00 PM", task: "🥍 Lacrosse Match", cat: "caden" }],
+                    4: [{ time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden" }, { time: "06:45 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
+                    5: [],
+                    6: [{ time: "09:00 AM", task: "⚽ Team Training Turf (DeRo)", cat: "dero" }]
+                }
+            },
+            4: { 
+                days: {
+                    0: [],
+                    1: [{ time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
+                    2: [{ time: "07:00 PM", task: "⚽ GAME: DeRo TFC Red vs FC Durham Black W", cat: "dero" }],
+                    3: [],
+                    4: [{ time: "06:45 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
+                    5: [],
+                    6: [{ time: "09:00 AM", task: "⚽ Team Training Turf (DeRo)", cat: "dero" }]
+                }
+            }
+        };
+
+        const SOCCER_WEEKS = {
+            1: {
+                title: "Week 1 - Speed & Skill Foundation",
+                mon: "Ball Mastery (30 min): 5' Toe taps scanning + 5' Inside/outside rolls + 8' Scissors only + 7' Walk pace dribble square + 5' Juggling challenge.",
+                tue: "Speed Intent (15 min): 15m high-knee strides with arm-pump focus + Team Practice.",
+                wed: "Endurance Base: 12-minute steady jog (Stamina builder) + 15 mins pro match analysis.",
+                thu: "Passing & Touch (20 min): 5' Inside foot wall passes + 5' One-touch returns + 5' Receive/turn + 5' Non-dominant foot only.",
+                fri: "Mobility Focus: Core activation planks + Team Practice.",
+                sat: "Endurance & Finish (35 min): 5' Warmup + 10' Cone dribble & shoot + 10' Alternate foot finishing + 7' Max sprints (6 reps of 20m, 30s rest).",
+                sun: "Match Day or Recovery + Free Afternoon."
+            },
+            2: {
+                title: "Week 2 - Sprint Mechanics & Power Play",
+                mon: "Ball Mastery (30 min): 5' Fast toe taps + 5' Sole rolls + 10' Step-overs + 7' Jog pace dribble square + 3' Record juggling.",
+                tue: "Sprint Mechanics (15 min): 8x 10m explosive starts starting from pushup position + Team Practice.",
+                wed: "Endurance Base: 15-minute progressive pace running + Match analysis.",
+                thu: "Passing & Touch (20 min): 5' Fast wall passes + 5' Laces drive passes + 5' Both foot turns + 5' Non-dominant foot drills.",
+                fri: "Core Day: Plank-to-Pushup circuits + Team Practice.",
+                sat: "Endurance & Finish (35 min): 10' Dribble & Body fake shot + 10' Toss volleys + 10' Sprint stamina runs (8 reps of 20m, 25s rest).",
+                sun: "Match Day or Recovery + Free Afternoon."
+            },
+            3: {
+                title: "Week 3 - Aerobic Stamina Capacity",
+                mon: "Ball Mastery (35 min): 5' Taps & cuts + 5' Combined footwork + 10' Scissors-Cruyff sequence + 10' Speed dribbling square.",
+                tue: "Speed Intent: 10x 20m arm-drive focused sprints + Team Practice.",
+                wed: "Endurance Pyramid: 2 min hard run -> 1 min jog -> 3 min hard run -> 1.5 min jog -> 2 min hard run + Match analysis.",
+                thu: "Passing & Touch (25 min): 5' Fast 1-touch + 5' Sideway moving passes + 8' Body feints + 7' Non-dominant foot isolation.",
+                fri: "Team Practice + Pro Meal Prep hydration check.",
+                sat: "Elite Fitness & Shooting (40 min): 12' High-speed dribble and shoot + 10' Curved finishes + 10' Shuttle runs (10 reps of 20m shuttle, 20s rest).",
+                sun: "Match Day or Recovery + Free Afternoon."
+            },
+            4: {
+                title: "Week 4 - Match Pace Peak & Performance",
+                mon: "Ball Mastery (35 min): 6' Max toe taps + 10' Scissors-stepover-Cruyff circuit + 12' Exploding dribble squares + 5' Left foot passing test.",
+                tue: "Power Starts: 6x 30m maximum effort sprints with timed splits + Team Practice.",
+                wed: "Endurance Peak: 20-minute continuous run (Aim for maximum distance) + Match analysis.",
+                thu: "Passing & Touch (25 min): 6' Max speed 1-touch + 6' Footwork passing + 8' Game-pace receiving/faking + 5' Juggling record attempt.",
+                fri: "Team Practice + Dynamic recovery.",
+                sat: "Peak Fitness & Finish (40 min): 12' Random-move shooting + 10' 20-shot challenge + 10' Sprints (10 reps of 20m dash, parent timed).",
+                sun: "Match Day + Mental reflection journal write-up."
+            }
+        };
+
+        window.addEventListener('load', () => {
+            initializeStorage();
+            selectWeek(currentWeekNum);
+            selectSoccerWeek(currentSoccerWeekNum);
+            updateMoneyCalculations();
+            loadAgreementProgress();
+        });
+
+        // Tab Navigation Switch System
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all";
+            });
+            document.getElementById(`btn-${tabId}`).className = "tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap bg-indigo-600 text-white transition-all shadow-md";
+        }
+
+        // Selected active calendar week handler
+        function selectWeek(weekNum) {
+            currentWeekNum = weekNum;
+            document.getElementById('dates-range-indicator').innerText = WEEK_DATE_LABELS[weekNum];
+            
+            document.querySelectorAll('.week-btn-daily').forEach(btn => {
+                btn.className = "week-btn-daily px-2.5 py-1 text-[11px] font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all";
+            });
+            document.getElementById(`week-daily-${weekNum}`).className = "week-btn-daily px-2.5 py-1 text-[11px] font-bold rounded-lg bg-indigo-600 text-white shadow-md transition-all";
+            
+            selectDay(currentDayIdx);
+        }
+
+        // Active day switcher
+        function selectDay(dayIdx) {
+            currentDayIdx = dayIdx;
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                btn.className = "day-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all";
+            });
+            document.getElementById(`day-${dayIdx}`).className = "day-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white shadow-md transition-all";
+            
+            const monContainer = document.getElementById('monday-toggle-container');
+            if (dayIdx === 0) {
+                monContainer.classList.remove('hidden');
+                const isOlderPracticeActive = localStorage.getItem('older_practice_monday_active') === 'true';
+                document.getElementById('monday-older-toggle').checked = isOlderPracticeActive;
+            } else {
+                monContainer.classList.add('hidden');
+            }
+
+            renderDailyChecklist();
+        }
+
+        function toggleMondayOlderPractice() {
+            const isChecked = document.getElementById('monday-older-toggle').checked;
+            localStorage.setItem('older_practice_monday_active', isChecked ? 'true' : 'false');
+            renderDailyChecklist();
+        }
+
+        function openInfoModal(modalId) {
+            document.getElementById(`${modalId}-modal`).classList.remove('hidden');
+        }
+
+        function closeInfoModal(modalId) {
+            document.getElementById(`${modalId}-modal`).classList.add('hidden');
+        }
+
+        // Soccer training week switcher
+        function selectSoccerWeek(weekNum) {
+            currentSoccerWeekNum = weekNum;
+            document.querySelectorAll('.week-soccer-btn').forEach(btn => {
+                btn.className = "week-soccer-btn px-4 py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all";
+            });
+            document.getElementById(`week-soccer-${weekNum}`).className = "week-soccer-btn px-4 py-2 text-xs font-bold rounded-lg bg-indigo-600 text-white shadow-md transition-all";
+
+            renderWeekRegimen();
+        }
+
+        function renderDailyChecklist() {
+            const checklistMount = document.getElementById('checklist-mount');
+            checklistMount.innerHTML = '';
+
+            const weekData = CALENDAR_WEEKS_DATA[currentWeekNum];
+            let activeCalendarEvents = weekData ? [...weekData.days[currentDayIdx]] : [];
+            
+            if (currentDayIdx === 0 && localStorage.getItem('older_practice_monday_active') === 'true') {
+                activeCalendarEvents.push({ time: "06:00 PM", task: "⚽ Caden 2013 DeRo Practice (With Year Older)", cat: "caden" });
+            }
+
+            const timeline = [
+                { time: "07:00 AM", task: "🥛 Hydrate & Fuel (1st Glass of Milk)", cat: "nutrition", id: `milk1_${currentWeekNum}_${currentDayIdx}` },
+                { time: "07:00 AM", task: "🍖 Morning Chore: Feeding Rio", cat: "chore", id: `ledger-feedam-${currentDayIdx}`, isChore: true },
+                { time: "07:05 AM", task: "🐕 Morning Chore: Walk Rio (AM Loop)", cat: "chore", id: `ledger-walkam-${currentDayIdx}`, isChore: true },
+                { time: "07:30 AM", task: "🧘 Morning Mobility & Core Activation", cat: "fitness", id: `mobility_${currentWeekNum}_${currentDayIdx}`, infoId: 'mobility' },
+                { time: "07:45 AM", task: "🧠 Daily Visual Scanning Brain Workout", cat: "soccer", id: `scan_${currentWeekNum}_${currentDayIdx}`, infoId: 'visual' }
+            ];
+
+            activeCalendarEvents.forEach((evt, idx) => {
+                if (evt.time.includes("AM") || evt.time.includes("Day")) {
+                    timeline.push({
+                        time: evt.time,
+                        task: evt.task,
+                        cat: evt.cat, 
+                        id: `cal_event_${currentWeekNum}_${currentDayIdx}_${idx}`
+                    });
+                }
+            });
+
+            timeline.push(
+                { time: "12:00 PM", task: "🥛 High-calorie Lunch (2nd Glass of Milk)", cat: "nutrition", id: `milk2_${currentWeekNum}_${currentDayIdx}` }
+            );
+
+            activeCalendarEvents.forEach((evt, idx) => {
+                if (evt.time.includes("PM") && !evt.time.startsWith("05:") && !evt.time.startsWith("06:") && !evt.time.startsWith("07:") && !evt.time.startsWith("08:")) {
+                    timeline.push({
+                        time: evt.time,
+                        task: evt.task,
+                        cat: evt.cat,
+                        id: `cal_event_${currentWeekNum}_${currentDayIdx}_${idx}`
+                    });
+                }
+            });
+
+            timeline.push(
+                { time: "03:30 PM", task: "🥜 Calorie Booster Snack (Peanut Butter + Fruit + 3rd Glass of Milk)", cat: "nutrition", id: `milk3_${currentWeekNum}_${currentDayIdx}` }
+            );
+
+            timeline.push(
+                { time: "05:00 PM", task: "🍖 Evening Chore: Feeding Rio", cat: "chore", id: `ledger-feedpm-${currentDayIdx}`, isChore: true },
+                { time: "05:05 PM", task: "🐕 Evening Chore: Walk Rio (PM Loop)", cat: "chore", id: `ledger-walkpm-${currentDayIdx}`, isChore: true },
+                { time: "05:10 PM", task: "🐱 Afternoon Chore: Oscar Litter Bin", cat: "chore", id: `ledger-litter-${currentDayIdx}`, isChore: true }
+            );
+
+            if (currentDayIdx === 0 || currentDayIdx === 3 || currentDayIdx === 5) {
+                timeline.push({ time: "05:15 PM", task: "💪 Power-Builder Muscle Circuit (Pushups, Squats, Lunges, Planks)", cat: "fitness", id: `strength_${currentWeekNum}_${currentDayIdx}` });
+            } else {
+                const hasPractice = activeCalendarEvents.some(e => e.task.includes("Practice") || e.task.includes("GAME"));
+                if (!hasPractice) {
+                    timeline.push({ time: "05:15 PM", task: "⚽ Solo Ball Mastery Training (30 min)", cat: "soccer", id: `solo_${currentWeekNum}_${currentDayIdx}` });
+                }
+            }
+
+            activeCalendarEvents.forEach((evt, idx) => {
+                const isEveningTime = evt.time.startsWith("05:") || evt.time.startsWith("06:") || evt.time.startsWith("07:") || evt.time.startsWith("08:");
+                if (isEveningTime) {
+                    timeline.push({
+                        time: evt.time,
+                        task: evt.task,
+                        cat: evt.cat,
+                        id: `cal_event_${currentWeekNum}_${currentDayIdx}_${idx}`
+                    });
+                }
+            });
+
+            timeline.push(
+                { time: "08:30 PM", task: "🥛 Protein Gain Fueling (PB Toast + 4th Glass of Milk)", cat: "nutrition", id: `milk4_${currentWeekNum}_${currentDayIdx}` }
+            );
+
+            const storedChecked = JSON.parse(localStorage.getItem('timeline_progress') || '{}');
+            const choreLedgerState = JSON.parse(localStorage.getItem('chore_ledger_progress') || '{}');
+
+            timeline.forEach((item) => {
+                const card = document.createElement('div');
+                
+                let borderCol = 'border-slate-800/60';
+                let bgCol = 'bg-slate-900/40';
+                let icon = 'schedule';
+                let iconCol = 'text-slate-400';
+
+                if (item.cat === 'caden') {
+                    borderCol = 'border-rose-500/40';
+                    bgCol = 'bg-rose-950/15';
+                    icon = 'person';
+                    iconCol = 'text-rose-400';
+                } else if (item.cat === 'dero') {
+                    borderCol = 'border-purple-500/40';
+                    bgCol = 'bg-purple-950/15';
+                    icon = 'sports_soccer';
+                    iconCol = 'text-purple-400';
+                } else if (item.cat === 'soccer') {
+                    borderCol = 'border-indigo-500/20';
+                    bgCol = 'bg-indigo-950/10';
+                    icon = 'sports_soccer';
+                    iconCol = 'text-indigo-400';
+                } else if (item.cat === 'nutrition') {
+                    borderCol = 'border-emerald-500/20';
+                    bgCol = 'bg-emerald-950/10';
+                    icon = 'local_drink';
+                    iconCol = 'text-emerald-400';
+                } else if (item.cat === 'fitness') {
+                    borderCol = 'border-amber-500/20';
+                    bgCol = 'bg-amber-950/10';
+                    icon = 'fitness_center';
+                    iconCol = 'text-amber-400';
+                } else if (item.cat === 'chore') {
+                    borderCol = 'border-cyan-500/20';
+                    bgCol = 'bg-cyan-950/10';
+                    icon = 'cleaning_services';
+                    iconCol = 'text-cyan-400';
+                }
+
+                // Sync checkbox state between timeline and ledger automatically
+                const isChecked = item.isChore 
+                    ? (choreLedgerState[item.id] ? 'checked' : '')
+                    : (storedChecked[item.id] ? 'checked' : '');
+
+                const infoMarkup = item.infoId 
+                    ? `<button onclick="openInfoModal('${item.infoId}')" class="info-btn ml-1.5"><span class="material-icons text-xs">info_outline</span></button>`
+                    : '';
+
+                card.className = `flex items-center justify-between p-3.5 rounded-2xl border ${borderCol} ${bgCol} hover:border-slate-700 transition duration-150`;
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="material-icons text-base ${iconCol}">${icon}</span>
+                        <div class="text-left">
+                            <span class="text-xs font-bold ${iconCol} block uppercase tracking-wider">${item.time}</span>
+                            <div class="flex items-center">
+                                <span class="text-xs md:text-sm text-slate-200 font-medium">${item.task}</span>
+                                ${infoMarkup}
+                            </div>
+                        </div>
+                    </div>
+                    <input type="checkbox" class="hub-checkbox" id="check-${item.id}" ${isChecked} onclick="toggleDailyProgress('${item.id}', ${item.isChore || false})">
+                `;
+                checklistMount.appendChild(card);
+            });
+
+            calculateDailyCompletion();
+        }
+
+        function toggleDailyProgress(itemId, isChore) {
+            const el = document.getElementById(`check-${itemId}`);
+            if (!el) return;
+
+            if (isChore) {
+                const choreLedgerState = JSON.parse(localStorage.getItem('chore_ledger_progress') || '{}');
+                choreLedgerState[itemId] = el.checked;
+                localStorage.setItem('chore_ledger_progress', JSON.stringify(choreLedgerState));
+
+                const ledgerCb = document.getElementById(itemId);
+                if (ledgerCb) ledgerCb.checked = el.checked;
+
+                updateMoneyCalculations();
+            } else {
+                const storedChecked = JSON.parse(localStorage.getItem('timeline_progress') || '{}');
+                storedChecked[itemId] = el.checked;
+                localStorage.setItem('timeline_progress', JSON.stringify(storedChecked));
+            }
+
+            calculateDailyCompletion();
+        }
+
+        // Ledger sync trigger when checked directly inside matrix
+        function ledgerCheckboxUpdated() {
+            updateMoneyCalculations();
+            renderDailyChecklist();
+        }
+
+        function calculateDailyCompletion() {
+            const checklistMount = document.getElementById('checklist-mount');
+            const checkboxes = checklistMount.querySelectorAll('.hub-checkbox');
+
+            let totalTasks = checkboxes.length;
+            let checkedTasks = 0;
+
+            checkboxes.forEach(cb => {
+                if (cb.checked) checkedTasks++;
+            });
+
+            const pct = totalTasks > 0 ? Math.round((checkedTasks / totalTasks) * 100) : 0;
+            
+            const ring = document.getElementById('score-ring');
+            const circumference = 402; 
+            const strokeDashoffset = circumference - (pct / 100) * circumference;
+            ring.style.strokeDashoffset = strokeDashoffset;
+
+            document.getElementById('score-percent').innerText = `${pct}%`;
+
+            let verdict = "Your daily habits dictate your success. Complete your routines to build momentum.";
+            if (pct === 100) {
+                verdict = "🔥 ELITE DAY! Perfect score. You are moving like a true professional academy player.";
+            } else if (pct >= 80) {
+                verdict = "⚡ GREAT FOCUS! You have covered almost all bases today. Finish strong!";
+            } else if (pct >= 50) {
+                verdict = "⚽ SOLID MOMENTUM. Keep checking items off. Discipline is built step-by-step.";
+            } else if (checkedTasks > 0) {
+                verdict = "🚀 Track started. Make today count, Caden!";
+            }
+
+            document.getElementById('coach-verdict').innerText = verdict;
+        }
+
+        function updateMoneyCalculations() {
+            let totalEarned = 0;
+            const choreLedgerState = JSON.parse(localStorage.getItem('chore_ledger_progress') || '{}');
+
+            // 1. Compute Daily
+            const dailyChoreKeys = ['room', 'feedam', 'feedpm', 'walkam', 'walkpm', 'litter'];
+            dailyChoreKeys.forEach(key => {
+                const basePrice = CHORE_PRICES[key];
+                for (let day = 0; day < 7; day++) {
+                    const id = `ledger-${key}-${day}`;
+                    const el = document.getElementById(id);
+                    
+                    if (el && choreLedgerState[id] !== undefined) {
+                        el.checked = choreLedgerState[id];
+                    }
+
+                    if (el && el.checked) {
+                        totalEarned += basePrice;
+                    }
+                }
+            });
+
+            // 2. Compute Weekly
+            const weeklyChoreKeys = ['garbage-thu', 'garbage-curb', 'laundry', 'vacuum', 'washrooms'];
+            weeklyChoreKeys.forEach(key => {
+                const id = `ledger-${key}`;
+                const el = document.getElementById(id);
+
+                if (el && choreLedgerState[id] !== undefined) {
+                    el.checked = choreLedgerState[id];
+                }
+
+                if (el && el.checked) {
+                    totalEarned += CHORE_PRICES[key];
+                }
+            });
+
+            const finalEarnings = Math.min(CAP_MAX, totalEarned);
+            const capReached = totalEarned >= CAP_MAX;
+
+            const spendSplit = finalEarnings * 0.50;
+            const saveSplit = finalEarnings * 0.50;
+
+            document.getElementById('total-val').innerText = finalEarnings.toFixed(2);
+            document.getElementById('spend-val').innerText = spendSplit.toFixed(2);
+            document.getElementById('save-val').innerText = saveSplit.toFixed(2);
+
+            document.getElementById('mini-spend-val').innerText = `$${spendSplit.toFixed(2)}`;
+            document.getElementById('mini-save-val').innerText = `$${saveSplit.toFixed(2)}`;
+
+            const pBarPercent = (finalEarnings / CAP_MAX) * 100;
+            const pBar = document.getElementById('p-bar');
+            pBar.style.width = `${pBarPercent}%`;
+
+            const toastCap = document.getElementById('p-bar-cap-toast');
+            if (capReached) {
+                toastCap.classList.remove('hidden');
+                pBar.classList.add('from-amber-400', 'to-emerald-400');
+            } else {
+                toastCap.classList.add('hidden');
+                pBar.classList.remove('from-amber-400', 'to-emerald-400');
+            }
+
+            // Sync selectors in Goal calculator
+            const selectWallet = document.getElementById('goal-fund-select');
+            selectWallet.options[0].text = `💸 Spend Pocket ($${spendSplit.toFixed(2)})`;
+            selectWallet.options[1].text = `🏦 Savings Vault ($${saveSplit.toFixed(2)})`;
+            selectWallet.options[2].text = `💰 Both Combined ($${finalEarnings.toFixed(2)})`;
+
+            calculateWeeksNeeded(finalEarnings, spendSplit, saveSplit);
+            saveChoreLedgerState();
+        }
+
+        function calculateWeeksNeeded(passedTotal, passedSpend, passedSave) {
+            const currentTotal = passedTotal !== undefined ? passedTotal : parseFloat(document.getElementById('total-val').innerText);
+            const currentSpend = passedSpend !== undefined ? passedSpend : parseFloat(document.getElementById('spend-val').innerText);
+            const currentSave = passedSave !== undefined ? passedSave : parseFloat(document.getElementById('save-val').innerText);
+
+            const goalName = document.getElementById('goal-name-input').value.trim();
+            const goalPrice = parseFloat(document.getElementById('goal-price-input').value);
+            const selectedFund = document.getElementById('goal-fund-select').value;
+            const estimateBox = document.getElementById('goal-estimate-box');
+
+            if (!goalName || isNaN(goalPrice) || goalPrice <= 0) {
+                estimateBox.classList.add('hidden');
+                return;
+            }
+
+            let velocity = 0;
+            if (selectedFund === 'spend') {
+                velocity = currentSpend;
+            } else if (selectedFund === 'save') {
+                velocity = currentSave;
+            } else {
+                velocity = currentTotal;
+            }
+
+            if (velocity <= 0) {
+                document.getElementById('goal-text-display').innerText = goalName;
+                document.getElementById('goal-weeks-display').innerText = 'Complete chores to save!';
+                estimateBox.classList.remove('hidden');
+                return;
+            }
+
+            const weeksNeeded = Math.ceil(goalPrice / velocity);
+            document.getElementById('goal-text-display').innerText = goalName;
+            document.getElementById('goal-weeks-display').innerText = weeksNeeded;
+            estimateBox.classList.remove('hidden');
+        }
+
+        function saveChoreLedgerState() {
+            const choreLedgerState = {};
+
+            const dailyChoreKeys = ['room', 'feedam', 'feedpm', 'walkam', 'walkpm', 'litter'];
+            dailyChoreKeys.forEach(key => {
+                for (let d = 0; d < 7; d++) {
+                    const id = `ledger-${key}-${d}`;
+                    const el = document.getElementById(id);
+                    if (el) choreLedgerState[id] = el.checked;
+                }
+            });
+
+            const weeklyChoreKeys = ['garbage-thu', 'garbage-curb', 'laundry', 'vacuum', 'washrooms'];
+            weeklyChoreKeys.forEach(key => {
+                const id = `ledger-${key}`;
+                const el = document.getElementById(id);
+                if (el) choreLedgerState[id] = el.checked;
+            });
+
+            localStorage.setItem('chore_ledger_progress', JSON.stringify(choreLedgerState));
+            
+            // Sync inputs inside LocalStorage
+            localStorage.setItem('goalName', document.getElementById('goal-name-input').value);
+            localStorage.setItem('goalPrice', document.getElementById('goal-price-input').value);
+            localStorage.setItem('goalFund', document.getElementById('goal-fund-select').value);
+        }
+
+        function renderWeekRegimen() {
+            const box = document.getElementById('week-regimen-box');
+            box.innerHTML = '';
+
+            const p = SOCCER_WEEKS[currentSoccerWeekNum];
+
+            const programMarkup = `
+                <div class="space-y-4">
+                    <div class="border-b border-slate-850 pb-2">
+                        <h3 class="text-base font-bold text-indigo-400">${p.title}</h3>
+                        <p class="text-[11px] text-slate-400 font-medium">Complete these drills during training hours to elevate ball execution mechanics.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-900/60 p-4 border border-slate-800 rounded-xl space-y-1">
+                            <span class="text-[10px] font-bold text-indigo-300 block uppercase tracking-wider">Monday (Active Drills)</span>
+                            <p class="text-xs text-slate-300 leading-relaxed">${p.mon}</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 border border-slate-800 rounded-xl space-y-1">
+                            <span class="text-[10px] font-bold text-indigo-300 block uppercase tracking-wider">Tuesday (Team Session Focus)</span>
+                            <p class="text-xs text-slate-300 leading-relaxed">${p.tue}</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 border border-slate-800 rounded-xl space-y-1">
+                            <span class="text-[10px] font-bold text-indigo-300 block uppercase tracking-wider">Wednesday (Cardio Endurance)</span>
+                            <p class="text-xs text-slate-300 leading-relaxed">${p.wed}</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 border border-slate-800 rounded-xl space-y-1">
+                            <span class="text-[10px] font-bold text-indigo-300 block uppercase tracking-wider">Thursday (Wall Passing Target)</span>
+                            <p class="text-xs text-slate-300 leading-relaxed">${p.thu}</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 border border-slate-800 rounded-xl space-y-1">
+                            <span class="text-[10px] font-bold text-indigo-300 block uppercase tracking-wider">Friday (Recovery &amp; Activation)</span>
+                            <p class="text-xs text-slate-300 leading-relaxed">${p.fri}</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 border border-slate-800 rounded-xl space-y-1">
+                            <span class="text-[10px] font-bold text-indigo-300 block uppercase tracking-wider">Saturday (Power Finish Drills)</span>
+                            <p class="text-xs text-slate-300 leading-relaxed">${p.sat}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            box.innerHTML = programMarkup;
+        }
+
+        // Switch financial guides content on screen
+        function switchGuide(guideId) {
+            document.getElementById('guide-box-lit').classList.add('hidden');
+            document.getElementById('guide-box-envelope').classList.add('hidden');
+            document.getElementById('guide-box-single-drawer').classList.add('hidden');
+            
+            document.getElementById(`guide-box-${guideId}`).classList.remove('hidden');
+
+            document.querySelectorAll('[id^="btn-guide-"]').forEach(btn => {
+                btn.className = "flex-1 sm:flex-initial bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 font-bold text-xs px-4 py-2 rounded-lg transition whitespace-nowrap";
+            });
+            document.getElementById(`btn-guide-${guideId}`).className = "flex-1 sm:flex-initial bg-indigo-600 text-white font-bold text-xs px-4 py-2 rounded-lg transition whitespace-nowrap";
+        }
+
+        function saveProgressState() {
+            const aggState = {
+                t1: document.getElementById('trial-week1').checked,
+                t2: document.getElementById('trial-week2').checked,
+                t3: document.getElementById('trial-week3').checked,
+                t4: document.getElementById('trial-week4').checked,
+                sc: document.getElementById('sig-caden').value,
+                sd: document.getElementById('sig-dad').value
+            };
+            localStorage.setItem('caden_agreement_progress', JSON.stringify(aggState));
+        }
+
+        function loadAgreementProgress() {
+            const raw = localStorage.getItem('caden_agreement_progress');
+            if (raw) {
+                const p = JSON.parse(raw);
+                document.getElementById('trial-week1').checked = p.t1 || false;
+                document.getElementById('trial-week2').checked = p.t2 || false;
+                document.getElementById('trial-week3').checked = p.t3 || false;
+                document.getElementById('trial-week4').checked = p.t4 || false;
+                document.getElementById('sig-caden').value = p.sc || '';
+                document.getElementById('sig-dad').value = p.sd || '';
+            }
+
+            // Load goal inputs
+            document.getElementById('goal-name-input').value = localStorage.getItem('goalName') || '';
+            document.getElementById('goal-price-input').value = localStorage.getItem('goalPrice') || '';
+            if (localStorage.getItem('goalFund')) {
+                document.getElementById('goal-fund-select').value = localStorage.getItem('goalFund');
+            }
+        }
+
+        function initializeStorage() {
+            if (!localStorage.getItem('timeline_progress')) {
+                localStorage.setItem('timeline_progress', '{}');
+            }
+            if (!localStorage.getItem('chore_ledger_progress')) {
+                localStorage.setItem('chore_ledger_progress', '{}');
+            }
+        }
+
+        function openResetModal() {
+            document.getElementById('reset-modal').classList.remove('hidden');
+        }
+
+        function closeResetModal() {
+            document.getElementById('reset-modal').classList.add('hidden');
+        }
+
+        function executeSystemReset() {
+            localStorage.setItem('timeline_progress', '{}');
+            localStorage.setItem('chore_ledger_progress', '{}');
+            localStorage.setItem('caden_agreement_progress', '{}');
+            localStorage.setItem('goalName', '');
+            localStorage.setItem('goalPrice', '');
+            localStorage.setItem('goalFund', 'save');
+            
+            const checkboxes = document.querySelectorAll('.hub-checkbox');
+            checkboxes.forEach(cb => cb.checked = false);
+
+            document.getElementById('sig-caden').value = '';
+            document.getElementById('sig-dad').value = '';
+            document.getElementById('goal-name-input').value = '';
+            document.getElementById('goal-price-input').value = '';
+            document.getElementById('goal-fund-select').value = 'save';
+
+            closeResetModal();
+            updateMoneyCalculations();
+            renderDailyChecklist();
+            
+            // Trigger success message
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 2500);
+        }
+
+        // Bypassing printable bypass instructions handler
+        function triggerSystemPrint() {
+            try {
+                window.focus();
+                window.print();
+            } catch (err) {
+                document.getElementById('print-trouble-box').classList.remove('hidden');
+            }
+            setTimeout(() => {
+                document.getElementById('print-trouble-box').classList.remove('hidden');
+            }, 800);
+        }
+    </script>
+</body>
+</html>
