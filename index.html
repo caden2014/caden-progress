@@ -1887,6 +1887,21 @@
             return progress;
         }
 
+        function incomingProgressMatchesLocal(progress = {}) {
+            return CLOUD_KEYS.every((key) => {
+                const incoming = progress[key] === undefined || progress[key] === null ? null : String(progress[key]);
+                const local = localStorage.getItem(key);
+                return incoming === local || (incoming === null && local === null);
+            });
+        }
+
+        function isUserActivelyEditing() {
+            const active = document.activeElement;
+            if (!active) return false;
+            const tag = (active.tagName || '').toLowerCase();
+            return tag === 'input' || tag === 'textarea' || tag === 'select' || active.isContentEditable;
+        }
+
         function applyCloudProgress(progress = {}) {
             isApplyingCloudData = true;
             CLOUD_KEYS.forEach((key) => {
@@ -1944,8 +1959,19 @@
 
             onSnapshot(userDocRef, (freshSnap) => {
                 if (!freshSnap.exists() || !freshSnap.data().progress || !hasStartedApp) return;
-                applyCloudProgress(freshSnap.data().progress);
+                const progress = freshSnap.data().progress;
+
+                // If this snapshot is just our own recent save, don't rebuild the page.
+                // Rebuilding while typing caused text selection to disappear and checkboxes to feel glitchy.
+                if (incomingProgressMatchesLocal(progress)) return;
+
+                applyCloudProgress(progress);
                 try {
+                    if (isUserActivelyEditing()) {
+                        // Keep the user's cursor/focus stable. The new data is saved locally,
+                        // and the screen will refresh normally after they switch tabs/reload.
+                        return;
+                    }
                     renderDailyChecklist();
                     updateMoneyCalculations();
                     loadAgreementProgress();
