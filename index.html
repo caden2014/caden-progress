@@ -1672,7 +1672,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -1763,7 +1763,7 @@
 
         async function startForUser(user) {
             currentUser = user;
-            userDocRef = doc(db, 'users', user.uid);
+            userDocRef = doc(db, 'users', user.email, 'progress', 'main');
             showOverlay('Loading your saved progress...');
 
             const snap = await getDoc(userDocRef);
@@ -1797,15 +1797,21 @@
         window.startCloudBackedApp = function() {
             showOverlay('Please sign in to sync your private progress.');
 
+            // Finish a Google redirect login if the browser just came back from Google.
+            getRedirectResult(auth).catch((err) => {
+                console.error('Redirect sign-in result error:', err);
+                showOverlay('Google sign-in did not finish. Try the button again.');
+            });
+
             const loginBtn = document.getElementById('firebase-login-btn');
             if (loginBtn) {
                 loginBtn.onclick = async () => {
                     try {
-                        showOverlay('Opening Google sign-in...');
-                        await signInWithPopup(auth, provider);
+                        showOverlay('Sending you to Google sign-in...');
+                        await signInWithRedirect(auth, provider);
                     } catch (err) {
                         console.error(err);
-                        showOverlay('Sign-in did not finish. Try the button again.');
+                        showOverlay('Sign-in could not start. Check popups/redirects and try again.');
                     }
                 };
             }
