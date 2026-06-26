@@ -1672,7 +1672,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -1698,6 +1698,9 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
+        setPersistence(auth, browserLocalPersistence).catch((err) => {
+            console.warn('Could not set Firebase auth persistence:', err);
+        });
 
         let currentUser = null;
         let userDocRef = null;
@@ -1807,11 +1810,19 @@
             if (loginBtn) {
                 loginBtn.onclick = async () => {
                     try {
-                        showOverlay('Sending you to Google sign-in...');
-                        await signInWithRedirect(auth, provider);
+                        // Popup sign-in is more reliable on GitHub Pages because redirect sign-in can be affected
+                        // by browsers that block third-party storage/cookies.
+                        showOverlay('Opening Google sign-in popup...');
+                        await signInWithPopup(auth, provider);
                     } catch (err) {
-                        console.error(err);
-                        showOverlay('Sign-in could not start. Check popups/redirects and try again.');
+                        console.error('Popup sign-in failed:', err);
+                        try {
+                            showOverlay('Popup was blocked. Sending you to Google sign-in instead...');
+                            await signInWithRedirect(auth, provider);
+                        } catch (redirectErr) {
+                            console.error('Redirect sign-in failed:', redirectErr);
+                            showOverlay('Google sign-in could not start. Try normal browser mode and allow popups.');
+                        }
                     }
                 };
             }
