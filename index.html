@@ -821,6 +821,48 @@
         </div>
     </div>
 
+
+    <!-- Schedule Edit Modal: stable editor, not rebuilt while typing -->
+    <div id="calendar-edit-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-filter backdrop-blur-md flex items-center justify-center p-4 z-50">
+        <div class="glass-card rounded-3xl max-w-lg w-full p-6 space-y-4 border border-slate-800 shadow-2xl text-left">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
+                <h3 class="text-base font-extrabold text-cyan-400 flex items-center gap-2">
+                    <span class="material-icons">edit_calendar</span> Edit Schedule Event
+                </h3>
+                <button onclick="closeCalendarEditModal()" class="text-slate-400 hover:text-white"><span class="material-icons">close</span></button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Time</label>
+                    <input id="calendar-edit-time" class="w-full mt-1 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-sm px-3 py-3 focus:outline-none focus:border-cyan-500" placeholder="07:00 PM">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Type</label>
+                    <select id="calendar-edit-type" class="w-full mt-1 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-sm px-3 py-3 focus:outline-none focus:border-cyan-500">
+                        <option value="game">Game</option>
+                        <option value="practice">Practice</option>
+                        <option value="personal">Personal</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Schedule text</label>
+                <textarea id="calendar-edit-task" rows="3" class="w-full mt-1 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-sm px-3 py-3 focus:outline-none focus:border-cyan-500" placeholder="What should this say?"></textarea>
+            </div>
+            <div>
+                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Opponent, optional</label>
+                <input id="calendar-edit-opponent" class="w-full mt-1 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-sm px-3 py-3 focus:outline-none focus:border-cyan-500" placeholder="Hidden in routine view when Hide opponents is on">
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                <button onclick="saveCalendarEditModal()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
+                    <span class="material-icons text-base">save</span> Save This Event
+                </button>
+                <button onclick="closeCalendarEditModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-bold px-4 py-3 rounded-xl transition">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Instruction Dialog: Mobility & Core -->
     <div id="mobility-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-filter backdrop-blur-md flex items-center justify-center p-4 z-50">
         <div class="glass-card rounded-3xl max-w-md w-full p-6 space-y-4 border border-slate-800 shadow-2xl text-left">
@@ -1172,19 +1214,17 @@
                             <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-3 space-y-2 mb-2">
                                 <div class="flex items-center justify-between gap-2">
                                     <span class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest">${dayNames[d]} Event ${idx + 1}</span>
-                                    <button onclick="deleteCalendarDraftEvent(${w}, ${d}, ${idx})" class="text-rose-300 hover:text-rose-200 text-xs font-bold">Delete</button>
+                                    <div class="flex items-center gap-3">
+                                        <button onclick="openCalendarEditModal(${w}, ${d}, ${idx})" class="text-cyan-300 hover:text-cyan-200 text-xs font-bold">Edit</button>
+                                        <button onclick="deleteCalendarDraftEvent(${w}, ${d}, ${idx})" class="text-rose-300 hover:text-rose-200 text-xs font-bold">Delete</button>
+                                    </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <input value="${safeTime}" oninput="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'time', this.value)" class="rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2" placeholder="Time">
-                                    <select onchange="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'type', this.value)" class="rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2">
-                                        <option value="game" ${evt.type === 'game' ? 'selected' : ''}>Game</option>
-                                        <option value="practice" ${evt.type === 'practice' ? 'selected' : ''}>Practice</option>
-                                        <option value="personal" ${evt.type === 'personal' ? 'selected' : ''}>Personal</option>
-                                        <option value="other" ${evt.type === 'other' ? 'selected' : ''}>Other</option>
-                                    </select>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <div class="rounded-lg bg-slate-950 border border-slate-800 text-slate-100 px-2 py-2">${safeTime || 'No time'}</div>
+                                    <div class="rounded-lg bg-slate-950 border border-slate-800 text-slate-100 px-2 py-2">${escapeHtml(evt.type || 'other')}</div>
                                 </div>
-                                <input value="${safeTask}" oninput="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'task', this.value)" class="w-full rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2" placeholder="Task label">
-                                <input value="${safeOpponent}" oninput="updateCalendarDraftEvent(${w}, ${d}, ${idx}, 'opponent', this.value)" class="w-full rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2" placeholder="Opponent (optional, hidden in routine view)">
+                                <div class="rounded-lg bg-slate-950 border border-slate-800 text-slate-100 text-xs px-2 py-2">${safeTask || 'No task text'}</div>
+                                <div class="rounded-lg bg-slate-950 border border-slate-800 text-slate-400 text-xs px-2 py-2">${safeOpponent || 'No opponent saved'}</div>
                             </div>`;
                     });
                     html += `</div>`;
@@ -1192,6 +1232,50 @@
                 html += `</div>`;
             }
             list.innerHTML = html;
+        }
+
+
+        let calendarEditTarget = null;
+
+        function openCalendarEditModal(week, day, index) {
+            ensureCalendarDraft();
+            const evt = calendarDraftSchedule?.[week]?.days?.[day]?.[index];
+            if (!evt) return;
+            calendarEditTarget = { week, day, index };
+
+            document.getElementById('calendar-edit-time').value = evt.time || '';
+            document.getElementById('calendar-edit-type').value = evt.type || 'other';
+            document.getElementById('calendar-edit-task').value = evt.task || '';
+            document.getElementById('calendar-edit-opponent').value = evt.opponent || '';
+
+            document.getElementById('calendar-edit-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('calendar-edit-task')?.focus(), 60);
+        }
+
+        function closeCalendarEditModal() {
+            document.getElementById('calendar-edit-modal')?.classList.add('hidden');
+            calendarEditTarget = null;
+        }
+
+        function saveCalendarEditModal() {
+            if (!calendarEditTarget) return;
+            ensureCalendarDraft();
+
+            const { week, day, index } = calendarEditTarget;
+            const evt = calendarDraftSchedule?.[week]?.days?.[day]?.[index];
+            if (!evt) return;
+
+            evt.time = document.getElementById('calendar-edit-time').value || '';
+            evt.type = document.getElementById('calendar-edit-type').value || 'other';
+            evt.task = document.getElementById('calendar-edit-task').value || '';
+            evt.opponent = document.getElementById('calendar-edit-opponent').value || '';
+            evt.cat = evt.type === 'game' || evt.type === 'practice' ? 'dero' : 'caden';
+
+            closeCalendarEditModal();
+            renderCalendarEditor();
+
+            const status = document.getElementById('calendar-save-status');
+            if (status) status.textContent = 'Event updated in the editor. Click Save Schedule Edits to sync it.';
         }
 
         function updateCalendarDraftEvent(week, day, index, field, value) {
@@ -1465,8 +1549,16 @@
                             </div>
                         </div>
                     </div>
-                    <input type="checkbox" class="hub-checkbox" id="check-${item.id}" ${isChecked} onclick="toggleDailyProgress('${item.id}', ${item.isChore || false})">
+                    <input type="checkbox" class="hub-checkbox" id="check-${item.id}" ${isChecked} onclick="event.stopPropagation(); toggleDailyProgress('${item.id}', ${item.isChore || false})">
                 `;
+                card.classList.add('cursor-pointer');
+                card.addEventListener('click', (evt) => {
+                    if (evt.target.closest('button, input, a, select, textarea')) return;
+                    const cb = card.querySelector(`#check-${CSS.escape(item.id)}`);
+                    if (!cb) return;
+                    cb.checked = !cb.checked;
+                    toggleDailyProgress(item.id, item.isChore || false);
+                });
                 checklistMount.appendChild(card);
             });
 
