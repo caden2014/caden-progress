@@ -943,6 +943,22 @@
         </div>
     </div>
 
+
+
+    <!-- Firebase Login Overlay -->
+    <div id="firebase-login-overlay" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+        <div class="glass-card rounded-3xl max-w-md w-full p-6 text-center space-y-4 border border-slate-700 shadow-2xl">
+            <div class="text-4xl">🔒</div>
+            <h2 class="text-xl font-black text-white">Private Progress Sync</h2>
+            <p class="text-sm text-slate-300 leading-relaxed">
+                Sign in with Google to sync your chores, goals, signatures, and routine progress across your devices.
+            </p>
+            <button id="firebase-login-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-3 rounded-xl transition shadow-lg">
+                Sign in with Google
+            </button>
+            <p id="firebase-login-status" class="text-xs text-slate-400"></p>
+        </div>
+    </div>
     <script>
         const CHORE_PRICES = {
             'room': 0.25,
@@ -1064,11 +1080,19 @@
         };
 
         window.addEventListener('load', () => {
-            initializeStorage();
-            selectWeek(currentWeekNum);
-            selectSoccerWeek(currentSoccerWeekNum);
-            updateMoneyCalculations();
-            loadAgreementProgress();
+            window.__startLocalApp = () => {
+                initializeStorage();
+                selectWeek(currentWeekNum);
+                selectSoccerWeek(currentSoccerWeekNum);
+                updateMoneyCalculations();
+                loadAgreementProgress();
+            };
+
+            if (window.startCloudBackedApp) {
+                window.startCloudBackedApp();
+            } else {
+                window.__startLocalApp();
+            }
         });
 
         // Tab Navigation Switch System
@@ -1644,5 +1668,160 @@
             }, 800);
         }
     </script>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCi03ozn7rxsphdejftSoCbndHY5JNm0Po",
+            authDomain: "caden-progress-app.firebaseapp.com",
+            projectId: "caden-progress-app",
+            storageBucket: "caden-progress-app.firebasestorage.app",
+            messagingSenderId: "337302994977",
+            appId: "1:337302994977:web:aa18bb48062e186e1ca360"
+        };
+
+        const CLOUD_KEYS = [
+            'timeline_progress',
+            'chore_ledger_progress',
+            'caden_agreement_progress',
+            'goalName',
+            'goalPrice',
+            'goalFund',
+            'older_practice_monday_active'
+        ];
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        let currentUser = null;
+        let userDocRef = null;
+        let isApplyingCloudData = false;
+        let hasStartedApp = false;
+        let saveTimer = null;
+
+        function showOverlay(message = '') {
+            const overlay = document.getElementById('firebase-login-overlay');
+            const status = document.getElementById('firebase-login-status');
+            if (overlay) overlay.classList.remove('hidden');
+            if (status) status.textContent = message;
+        }
+
+        function hideOverlay() {
+            const overlay = document.getElementById('firebase-login-overlay');
+            if (overlay) overlay.classList.add('hidden');
+        }
+
+        function readAllLocalProgress() {
+            const progress = {};
+            CLOUD_KEYS.forEach((key) => {
+                progress[key] = localStorage.getItem(key);
+            });
+            return progress;
+        }
+
+        function applyCloudProgress(progress = {}) {
+            isApplyingCloudData = true;
+            CLOUD_KEYS.forEach((key) => {
+                if (progress[key] !== undefined && progress[key] !== null) {
+                    localStorage.setItem(key, progress[key]);
+                }
+            });
+            isApplyingCloudData = false;
+        }
+
+        async function saveAllProgressToCloud() {
+            if (!userDocRef || isApplyingCloudData) return;
+            await setDoc(userDocRef, {
+                progress: readAllLocalProgress(),
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+        }
+
+        function scheduleCloudSave() {
+            if (!userDocRef || isApplyingCloudData) return;
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                saveAllProgressToCloud().catch((err) => {
+                    console.error('Cloud save failed:', err);
+                });
+            }, 350);
+        }
+
+        const originalSetItem = Storage.prototype.setItem;
+        Storage.prototype.setItem = function(key, value) {
+            originalSetItem.call(this, key, value);
+            if (this === localStorage && CLOUD_KEYS.includes(key)) {
+                scheduleCloudSave();
+            }
+        };
+
+        async function startForUser(user) {
+            currentUser = user;
+            userDocRef = doc(db, 'users', user.uid);
+            showOverlay('Loading your saved progress...');
+
+            const snap = await getDoc(userDocRef);
+            if (snap.exists() && snap.data().progress) {
+                applyCloudProgress(snap.data().progress);
+            } else {
+                await saveAllProgressToCloud();
+            }
+
+            if (!hasStartedApp) {
+                hasStartedApp = true;
+                if (window.__startLocalApp) window.__startLocalApp();
+            }
+
+            hideOverlay();
+
+            onSnapshot(userDocRef, (freshSnap) => {
+                if (!freshSnap.exists() || !freshSnap.data().progress || !hasStartedApp) return;
+                applyCloudProgress(freshSnap.data().progress);
+                try {
+                    renderDailyChecklist();
+                    updateMoneyCalculations();
+                    loadAgreementProgress();
+                    calculateDailyCompletion();
+                } catch (err) {
+                    console.warn('Refreshed cloud data, but UI refresh had a warning:', err);
+                }
+            });
+        }
+
+        window.startCloudBackedApp = function() {
+            showOverlay('Please sign in to sync your private progress.');
+
+            const loginBtn = document.getElementById('firebase-login-btn');
+            if (loginBtn) {
+                loginBtn.onclick = async () => {
+                    try {
+                        showOverlay('Opening Google sign-in...');
+                        await signInWithPopup(auth, provider);
+                    } catch (err) {
+                        console.error(err);
+                        showOverlay('Sign-in did not finish. Try the button again.');
+                    }
+                };
+            }
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    startForUser(user).catch((err) => {
+                        console.error(err);
+                        showOverlay('Could not load cloud progress. Check Firestore rules and Authentication setup.');
+                    });
+                } else {
+                    showOverlay('Please sign in to sync your private progress.');
+                }
+            });
+        };
+    </script>
+
 </body>
 </html>
