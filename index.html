@@ -223,6 +223,15 @@
                         </label>
                     </div>
 
+                    <!-- Late-start safety switch -->
+                    <div id="late-start-container" class="p-3 rounded-2xl bg-amber-950/25 border border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="text-left space-y-0.5">
+                            <span class="text-xs font-bold text-amber-300 uppercase tracking-wider block">Running Late?</span>
+                            <span id="late-start-note" class="text-xs text-slate-300">Use this if you wake up late. It keeps the day from feeling ruined.</span>
+                        </div>
+                        <button id="late-start-btn" onclick="toggleLateStartMode()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition">I’m running late</button>
+                    </div>
+
                     <!-- Dynamic Day Checklist Mount Point -->
                     <div id="checklist-mount" class="space-y-3">
                         <!-- Populated dynamically and synced directly to the database -->
@@ -598,16 +607,24 @@
 
                     <div class="space-y-3">
                         <div class="bg-slate-900/40 p-3.5 border border-slate-800 rounded-xl space-y-1">
+                            <strong class="text-xs text-emerald-300 block uppercase tracking-wide">🍳 Breakfast - Pick 1</strong>
+                            <p class="text-xs text-slate-400 leading-relaxed">Eggs + toast + fruit, oatmeal + peanut butter + banana, Greek yogurt + granola, or cereal + milk + fruit. Try to include protein, carbs, and water.</p>
+                        </div>
+                        <div class="bg-slate-900/40 p-3.5 border border-slate-800 rounded-xl space-y-1">
+                            <strong class="text-xs text-emerald-300 block uppercase tracking-wide">🥪 Lunch - Build Plate</strong>
+                            <p class="text-xs text-slate-400 leading-relaxed">Protein sandwich/wrap or leftovers + fruit/veggies + milk/water. Add rice, pasta, bread, or potatoes on heavy soccer days.</p>
+                        </div>
+                        <div class="bg-slate-900/40 p-3.5 border border-slate-800 rounded-xl space-y-1">
+                            <strong class="text-xs text-emerald-300 block uppercase tracking-wide">🥜 Snack - 3:30 PM</strong>
+                            <p class="text-xs text-slate-400 leading-relaxed">Banana or apple + peanut butter, yogurt, granola bar, trail mix, or toast. This is your fuel before training.</p>
+                        </div>
+                        <div class="bg-slate-900/40 p-3.5 border border-slate-800 rounded-xl space-y-1">
+                            <strong class="text-xs text-emerald-300 block uppercase tracking-wide">🍽️ Dinner + Recovery</strong>
+                            <p class="text-xs text-slate-400 leading-relaxed">Chicken/beef/fish/eggs/beans + rice/pasta/potatoes + veggies. On game/practice nights, eat dinner after if the event is too close.</p>
+                        </div>
+                        <div class="bg-slate-900/40 p-3.5 border border-slate-800 rounded-xl space-y-1">
                             <strong class="text-xs text-emerald-300 block uppercase tracking-wide">🥛 The 4-Glass Milk Protocol</strong>
-                            <p class="text-xs text-slate-400 leading-relaxed">Drink one 250ml glass of milk (or soy milk) at 7:00 AM, 12:00 PM, 3:30 PM, and 8:30 PM. Adds easy, safe calories and proteins!</p>
-                        </div>
-                        <div class="bg-slate-900/40 p-3.5 border border-slate-800 rounded-xl space-y-1">
-                            <strong class="text-xs text-emerald-300 block uppercase tracking-wide">🥜 Calorie Booster Snack (3:30 PM)</strong>
-                            <p class="text-xs text-slate-400 leading-relaxed">Eat sliced apples or bananas loaded with 2 tablespoons of peanut butter between school and soccer training.</p>
-                        </div>
-                        <div class="bg-slate-900/40 p-3.5 border border-slate-800 rounded-xl space-y-1">
-                            <strong class="text-xs text-emerald-300 block uppercase tracking-wide">🍳 Triple Protein Goal</strong>
-                            <p class="text-xs text-slate-400 leading-relaxed">Aim for three protein sources a day: eggs at breakfast, chicken/beef at lunch, and a high-protein peanut butter toast or turkey roll-up at 8:30 PM.</p>
+                            <p class="text-xs text-slate-400 leading-relaxed">Drink one 250ml glass of milk (or soy milk) at breakfast, lunch, 3:30 PM, and 8:30 PM. Adds easy, safe calories and proteins.</p>
                         </div>
                     </div>
                 </section>
@@ -1091,6 +1108,7 @@
                 updateMoneyCalculations();
                 loadAgreementProgress();
                 setHideOpponentsToggleFromStorage();
+                updateLateStartUI();
                 renderCalendarEditor();
             };
 
@@ -1376,6 +1394,50 @@
                 monContainer.classList.add('hidden');
             }
 
+            updateLateStartUI();
+            renderDailyChecklist();
+        }
+
+        function getLateStartState() {
+            try {
+                return JSON.parse(localStorage.getItem('late_start_state') || '{}');
+            } catch (err) {
+                return {};
+            }
+        }
+
+        function getLateStartKey() {
+            return `${currentWeekNum}_${currentDayIdx}`;
+        }
+
+        function isLateStartModeActive() {
+            const state = getLateStartState();
+            return !!state[getLateStartKey()];
+        }
+
+        function updateLateStartUI() {
+            const btn = document.getElementById('late-start-btn');
+            const note = document.getElementById('late-start-note');
+            const active = isLateStartModeActive();
+            if (btn) {
+                btn.textContent = active ? 'Back to normal times' : 'I’m running late';
+                btn.className = active
+                    ? 'bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition'
+                    : 'bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition';
+            }
+            if (note) {
+                note.textContent = active
+                    ? 'Late-start mode is on: do must-dos first, skip extras, and keep going.'
+                    : 'Use this if you wake up late. It keeps the day from feeling ruined.';
+            }
+        }
+
+        function toggleLateStartMode() {
+            const state = getLateStartState();
+            const key = getLateStartKey();
+            state[key] = !state[key];
+            localStorage.setItem('late_start_state', JSON.stringify(state));
+            updateLateStartUI();
             renderDailyChecklist();
         }
 
@@ -1416,13 +1478,26 @@
                 activeCalendarEvents.push({ time: "06:00 PM", task: "⚽ Caden 2013 DeRo Practice (With Year Older)", cat: "caden" });
             }
 
-            const timeline = [
-                { time: "07:00 AM", task: "🥛 Hydrate & Fuel (1st Glass of Milk)", cat: "nutrition", id: `milk1_${currentWeekNum}_${currentDayIdx}` },
-                { time: "07:00 AM", task: "🍖 Morning Chore: Feeding Rio", cat: "chore", id: `ledger-feedam-${currentDayIdx}`, isChore: true },
-                { time: "07:05 AM", task: "🐕 Morning Chore: Walk Rio (AM Loop)", cat: "chore", id: `ledger-walkam-${currentDayIdx}`, isChore: true },
-                { time: "07:30 AM", task: "🧘 Morning Mobility & Core Activation", cat: "fitness", id: `mobility_${currentWeekNum}_${currentDayIdx}`, infoId: 'mobility' },
-                { time: "07:45 AM", task: "🧠 Daily Visual Scanning Brain Workout", cat: "soccer", id: `scan_${currentWeekNum}_${currentDayIdx}`, infoId: 'visual' }
-            ];
+            const lateMode = isLateStartModeActive();
+            const morningTime = lateMode ? "ASAP" : "07:00 AM";
+            const walkTime = lateMode ? "ASAP + 5" : "07:05 AM";
+            const roomTime = lateMode ? "ASAP + 15" : "07:20 AM";
+            const mobilityTime = lateMode ? "Only if time" : "07:35 AM";
+            const scanTime = lateMode ? "Only if time" : "07:45 AM";
+
+            const timeline = [];
+            if (lateMode) {
+                timeline.push({ time: "NOW", task: "🟡 Late Start Rescue: Rio first, quick breakfast, clean room fast, then skip extras if needed. The day is NOT ruined.", cat: "other", id: `late_rescue_${currentWeekNum}_${currentDayIdx}` });
+            }
+
+            timeline.push(
+                { time: morningTime, task: "🍳 Breakfast + 1st Glass of Milk", cat: "nutrition", id: `breakfast_${currentWeekNum}_${currentDayIdx}` },
+                { time: morningTime, task: "🍖 Morning Chore: Feeding Rio", cat: "chore", id: `ledger-feedam-${currentDayIdx}`, isChore: true },
+                { time: walkTime, task: "🐕 Morning Chore: Walk Rio (AM Loop)", cat: "chore", id: `ledger-walkam-${currentDayIdx}`, isChore: true },
+                { time: roomTime, task: "🧹 Daily Chore: Clean Room", cat: "chore", id: `ledger-room-${currentDayIdx}`, isChore: true },
+                { time: mobilityTime, task: "🧘 Morning Mobility & Core Activation", cat: "fitness", id: `mobility_${currentWeekNum}_${currentDayIdx}`, infoId: 'mobility' },
+                { time: scanTime, task: "🧠 Daily Visual Scanning Brain Workout", cat: "soccer", id: `scan_${currentWeekNum}_${currentDayIdx}`, infoId: 'visual' }
+            );
 
             activeCalendarEvents.forEach((evt, idx) => {
                 if (evt.time.includes("AM") || evt.time.includes("Day")) {
@@ -1436,7 +1511,7 @@
             });
 
             timeline.push(
-                { time: "12:00 PM", task: "🥛 High-calorie Lunch (2nd Glass of Milk)", cat: "nutrition", id: `milk2_${currentWeekNum}_${currentDayIdx}` }
+                { time: "12:00 PM", task: "🥪 Lunch + 2nd Glass of Milk", cat: "nutrition", id: `lunch_${currentWeekNum}_${currentDayIdx}` }
             );
 
             activeCalendarEvents.forEach((evt, idx) => {
@@ -1460,13 +1535,28 @@
                 { time: "05:10 PM", task: "🐱 Afternoon Chore: Oscar Litter Bin", cat: "chore", id: `ledger-litter-${currentDayIdx}`, isChore: true }
             );
 
+            const weeklyJobsByDay = {
+                1: [{ time: "05:30 PM", task: "👕 Weekly Job: Fold Laundry", cat: "chore", id: "ledger-laundry", isChore: true }],
+                3: [{ time: "05:30 PM", task: "🗑️ Weekly Job: Garbage Thursday", cat: "chore", id: "ledger-garbage-thu", isChore: true }, { time: "05:35 PM", task: "🚚 Weekly Job: Garbage to Curb", cat: "chore", id: "ledger-garbage-curb", isChore: true }],
+                5: [{ time: "10:45 AM", task: "🔌 Weekly Job: Vacuum Upstairs", cat: "chore", id: "ledger-vacuum", isChore: true }],
+                6: [{ time: "11:00 AM", task: "🧽 Weekly Job: Cleaning Washrooms", cat: "chore", id: "ledger-washrooms", isChore: true }]
+            };
+            (weeklyJobsByDay[currentDayIdx] || []).forEach(job => timeline.push(job));
+
+            timeline.push({ time: "06:15 PM", task: "🍽️ Dinner / Recovery Meal (move after game or practice if needed)", cat: "nutrition", id: `dinner_${currentWeekNum}_${currentDayIdx}` });
+
+            const soccerDayKeys = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+            const soccerPlanText = SOCCER_WEEKS[currentWeekNum]?.[soccerDayKeys[currentDayIdx]] || 'Light ball touches, juggling, passing, or recovery.';
+            const hasPracticeOrGame = activeCalendarEvents.some(e => (e.task || '').includes("Practice") || (e.task || '').includes("GAME") || (e.task || '').includes("Training"));
+
             if (currentDayIdx === 0 || currentDayIdx === 3 || currentDayIdx === 5) {
                 timeline.push({ time: "05:15 PM", task: "💪 Power-Builder Muscle Circuit (Pushups, Squats, Lunges, Planks)", cat: "fitness", id: `strength_${currentWeekNum}_${currentDayIdx}` });
+            }
+
+            if (!hasPracticeOrGame) {
+                timeline.push({ time: "05:45 PM", task: `⚽ Soccer Solo Drills: ${soccerPlanText}`, cat: "soccer", id: `solo_${currentWeekNum}_${currentDayIdx}` });
             } else {
-                const hasPractice = activeCalendarEvents.some(e => e.task.includes("Practice") || e.task.includes("GAME"));
-                if (!hasPractice) {
-                    timeline.push({ time: "05:15 PM", task: "⚽ Solo Ball Mastery Training (30 min)", cat: "soccer", id: `solo_${currentWeekNum}_${currentDayIdx}` });
-                }
+                timeline.push({ time: "Before event", task: "⚽ Light Soccer Prep: 5-10 min juggling/touches only. Save energy for team training or game.", cat: "soccer", id: `light_solo_${currentWeekNum}_${currentDayIdx}` });
             }
 
             activeCalendarEvents.forEach((evt, idx) => {
@@ -1484,6 +1574,24 @@
             timeline.push(
                 { time: "08:30 PM", task: "🥛 Protein Gain Fueling (PB Toast + 4th Glass of Milk)", cat: "nutrition", id: `milk4_${currentWeekNum}_${currentDayIdx}` }
             );
+
+            const timeRank = (time) => {
+                if (!time) return 9999;
+                if (time === 'NOW') return 0;
+                if (time.startsWith('ASAP')) return 1;
+                if (time.startsWith('Only if time')) return 2;
+                if (time === 'Before event') return 900;
+                if (time.includes('All Day')) return 3;
+                const match = time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+                if (!match) return 800;
+                let h = parseInt(match[1], 10);
+                const m = parseInt(match[2], 10);
+                const ap = match[3].toUpperCase();
+                if (ap === 'PM' && h !== 12) h += 12;
+                if (ap === 'AM' && h === 12) h = 0;
+                return h * 60 + m;
+            };
+            timeline.sort((a, b) => timeRank(a.time) - timeRank(b.time));
 
             const storedChecked = JSON.parse(localStorage.getItem('timeline_progress') || '{}');
             const choreLedgerState = JSON.parse(localStorage.getItem('chore_ledger_progress') || '{}');
@@ -1879,6 +1987,7 @@
             localStorage.setItem('goalName', '');
             localStorage.setItem('goalPrice', '');
             localStorage.setItem('goalFund', 'save');
+            localStorage.setItem('late_start_state', '{}');
             
             const checkboxes = document.querySelectorAll('.hub-checkbox');
             checkboxes.forEach(cb => cb.checked = false);
@@ -1942,7 +2051,8 @@
             'goalFund',
             'older_practice_monday_active',
             'custom_calendar_schedule',
-            'hide_opponents_enabled'
+            'hide_opponents_enabled',
+            'late_start_state'
         ];
 
         const app = initializeApp(firebaseConfig);
