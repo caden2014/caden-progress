@@ -1013,31 +1013,37 @@
         let currentDayIdx = new Date().getDay(); 
         currentDayIdx = currentDayIdx === 0 ? 6 : currentDayIdx - 1; 
         
-        let currentWeekNum = 1; // Default to Week 1 for the July calendar photos
+        let currentWeekNum = 1; // Default to Week 1 for the June 29 - July 25 schedule
         let currentSoccerWeekNum = 1;
 
         const WEEK_DATE_LABELS = {
             1: "June 29 - July 5, 2026",
             2: "July 6 - July 12, 2026",
             3: "July 13 - July 19, 2026",
-            4: "July 20 - July 26, 2026"
+            4: "July 20 - July 25, 2026"
         };
 
-        const DEFAULT_CALENDAR_VERSION = 'july-2026-photo-schedule-v1';
+        const DEFAULT_CALENDAR_VERSION = 'june29-july25-provided-photos-only-v1';
 
+        // Official default calendar made ONLY from the four calendar photos you provided.
+        // Date range: June 29 - July 25, 2026.
+        // Day keys are app days: 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun.
+        // Red = Caden. Purple = DeRo / soccer-related. Opponents are hidden by default.
+        // Caden 2013 practice is marked optional because you said it is not guaranteed.
+        // Sister's lacrosse is marked optional because you said you do not always go.
         const CALENDAR_WEEKS_DATA = {
             1: { 
                 days: {
-                    // Week 1: June 29 - July 5, 2026
-                    0: [],
+                    // Week 1: Mon Jun 29 - Sun Jul 5
+                    0: [
+                        { time: "06:00 PM", task: "⚽ Optional: Caden 2013 DeRo Practice", cat: "caden", type: "practice" }
+                    ],
                     1: [
                         { time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero", type: "practice" }
                     ],
-                    2: [
-                        { time: "All Day", task: "🍁 Canada Day Holiday", cat: "other", type: "other" }
-                    ],
+                    2: [],
                     3: [
-                        { time: "05:00 PM", task: "🎉 Birthday / Flying Squirrel", cat: "caden", type: "personal" },
+                        { time: "05:00 PM", task: "🎉 Can's Birthday - Flying Squirrel", cat: "caden", type: "personal" },
                         { time: "06:00 PM", task: "🥍 Optional: Sister's Lacrosse", cat: "other", type: "personal" }
                     ],
                     4: [
@@ -1051,9 +1057,10 @@
             },
             2: { 
                 days: {
-                    // Week 2: July 6 - July 12, 2026
+                    // Week 2: Mon Jul 6 - Sun Jul 12
                     0: [
-                        { time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden", type: "personal" }
+                        { time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden", type: "personal" },
+                        { time: "06:00 PM", task: "⚽ Optional: Caden 2013 DeRo Practice", cat: "caden", type: "practice" }
                     ],
                     1: [
                         { time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden", type: "personal" },
@@ -1061,7 +1068,8 @@
                     ],
                     2: [
                         { time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden", type: "personal" },
-                        { time: "07:00 PM", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero", type: "game", opponent: "Hidden" }
+                        { time: "07:00 PM", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero", type: "game", opponent: "Hidden" },
+                        { time: "TBD", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero", type: "game", opponent: "Hidden" }
                     ],
                     3: [
                         { time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden", type: "personal" },
@@ -1079,18 +1087,20 @@
             },
             3: { 
                 days: {
-                    // Week 3: July 13 - July 19, 2026
+                    // Week 3: Mon Jul 13 - Sun Jul 19
                     0: [
-                        { time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden", type: "personal" }
+                        { time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden", type: "personal" },
+                        { time: "06:00 PM", task: "⚽ Optional: Caden 2013 DeRo Practice", cat: "caden", type: "practice" }
                     ],
                     1: [
                         { time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden", type: "personal" },
                         { time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero", type: "practice" }
                     ],
                     2: [
-                        { time: "All Day", task: "💵 Monthly fee payment reminder", cat: "other", type: "other" },
+                        { time: "TBD", task: "💳 Monthly Fee Payment Time is TBD", cat: "caden", type: "personal" },
                         { time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden", type: "personal" },
-                        { time: "07:00 PM", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero", type: "game", opponent: "Hidden" }
+                        { time: "07:00 PM", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero", type: "game", opponent: "Hidden" },
+                        { time: "TBD", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero", type: "game", opponent: "Hidden" }
                     ],
                     3: [
                         { time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden", type: "personal" },
@@ -1108,12 +1118,15 @@
             },
             4: { 
                 days: {
-                    // Week 4: July 20 - July 26, 2026
-                    0: [],
+                    // Week 4: Mon Jul 20 - Sat Jul 25
+                    0: [
+                        { time: "06:00 PM", task: "⚽ Optional: Caden 2013 DeRo Practice", cat: "caden", type: "practice" }
+                    ],
                     1: [
                         { time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero", type: "practice" }
                     ],
                     2: [
+                        { time: "07:00 PM", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero", type: "game", opponent: "Hidden" },
                         { time: "07:00 PM", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero", type: "game", opponent: "Hidden" }
                     ],
                     3: [],
@@ -1121,9 +1134,7 @@
                         { time: "06:45 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero", type: "practice" }
                     ],
                     5: [],
-                    6: [
-                        { time: "09:00 AM", task: "⚽ Team Training Turf (DeRo) — confirm", cat: "dero", type: "practice" }
-                    ]
+                    6: []
                 }
             }
         };
@@ -1650,7 +1661,10 @@
             let activeCalendarEvents = weekData ? [...(weekData.days[currentDayIdx] || [])] : [];
             
             if (currentDayIdx === 0 && localStorage.getItem('older_practice_monday_active') === 'true') {
-                activeCalendarEvents.push({ time: "06:00 PM", task: "⚽ Caden 2013 DeRo Practice (With Year Older)", cat: "caden" });
+                const alreadyHas2013Practice = activeCalendarEvents.some(e => (e.task || '').includes('2013 DeRo Practice'));
+                if (!alreadyHas2013Practice) {
+                    activeCalendarEvents.push({ time: "06:00 PM", task: "⚽ Optional: Caden 2013 DeRo Practice", cat: "caden", type: "practice" });
+                }
             }
 
             const lateMode = isLateStartModeActive();
