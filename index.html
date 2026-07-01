@@ -809,6 +809,19 @@
                         </div>
 
                         <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 space-y-3">
+                            <h3 class="text-xs font-bold text-emerald-300 uppercase tracking-widest">Daily time editor</h3>
+                            <p class="text-[11px] text-slate-400">Change the regular times without changing the whole schedule. These sync after you save.</p>
+                            <div id="routine-time-editor" class="space-y-2"></div>
+                            <button onclick="saveRoutineTimeSettings()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
+                                <span class="material-icons text-base">schedule</span> Save Time Changes
+                            </button>
+                            <button onclick="resetRoutineTimeSettings()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
+                                <span class="material-icons text-base">restart_alt</span> Reset Times
+                            </button>
+                            <p id="routine-time-status" class="text-xs text-slate-400">Times are using the default routine unless you save changes.</p>
+                        </div>
+
+                        <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 space-y-3">
                             <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest">Save or reset</h3>
                             <button onclick="saveImportedCalendarSchedule()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2">
                                 <span class="material-icons text-base">save</span> Save Schedule Edits
@@ -1000,7 +1013,7 @@
         let currentDayIdx = new Date().getDay(); 
         currentDayIdx = currentDayIdx === 0 ? 6 : currentDayIdx - 1; 
         
-        let currentWeekNum = 4; // Default Week 4 Active
+        let currentWeekNum = 1; // Default to Week 1 for the July calendar photos
         let currentSoccerWeekNum = 1;
 
         const WEEK_DATE_LABELS = {
@@ -1010,49 +1023,107 @@
             4: "July 20 - July 26, 2026"
         };
 
+        const DEFAULT_CALENDAR_VERSION = 'july-2026-photo-schedule-v1';
+
         const CALENDAR_WEEKS_DATA = {
             1: { 
                 days: {
+                    // Week 1: June 29 - July 5, 2026
                     0: [],
-                    1: [{ time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
-                    2: [{ time: "All Day", task: "🍁 Canada Day Holiday", cat: "other" }],
-                    3: [{ time: "05:00 PM", task: "🐿️ Can't Birthday - Flying Squirrel", cat: "caden" }, { time: "06:00 PM", task: "🥍 Lacrosse Match", cat: "caden" }],
-                    4: [{ time: "12:45 PM", task: "🩺 Video Appointment (Dr. Al Naser)", cat: "caden" }, { time: "06:45 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
+                    1: [
+                        { time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero", type: "practice" }
+                    ],
+                    2: [
+                        { time: "All Day", task: "🍁 Canada Day Holiday", cat: "other", type: "other" }
+                    ],
+                    3: [
+                        { time: "05:00 PM", task: "🎉 Birthday / Flying Squirrel", cat: "caden", type: "personal" },
+                        { time: "06:00 PM", task: "🥍 Optional: Sister's Lacrosse", cat: "other", type: "personal" }
+                    ],
+                    4: [
+                        { time: "06:45 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero", type: "practice" }
+                    ],
                     5: [],
-                    6: [{ time: "09:00 AM", task: "⚽ Team Training Turf (DeRo)", cat: "dero" }, { time: "10:00 AM", task: "🥍 Lacrosse", cat: "caden" }, { time: "01:30 PM", task: "🎉 Joanne's End of School Party", cat: "caden" }]
+                    6: [
+                        { time: "09:00 AM", task: "⚽ Team Training Turf (DeRo)", cat: "dero", type: "practice" }
+                    ]
                 }
             },
             2: { 
                 days: {
-                    0: [{ time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden" }],
-                    1: [{ time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden" }, { time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
-                    2: [{ time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden" }, { time: "07:00 PM", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero" }],
-                    3: [{ time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden" }, { time: "06:00 PM", task: "🥍 Lacrosse Match", cat: "caden" }],
-                    4: [{ time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden" }, { time: "06:45 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
+                    // Week 2: July 6 - July 12, 2026
+                    0: [
+                        { time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden", type: "personal" }
+                    ],
+                    1: [
+                        { time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden", type: "personal" },
+                        { time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero", type: "practice" }
+                    ],
+                    2: [
+                        { time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden", type: "personal" },
+                        { time: "07:00 PM", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero", type: "game", opponent: "Hidden" }
+                    ],
+                    3: [
+                        { time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden", type: "personal" },
+                        { time: "06:00 PM", task: "🥍 Optional: Sister's Lacrosse", cat: "other", type: "personal" }
+                    ],
+                    4: [
+                        { time: "09:00 AM", task: "💻 Caden Coding Camp (McKinney)", cat: "caden", type: "personal" },
+                        { time: "06:45 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero", type: "practice" }
+                    ],
                     5: [],
-                    6: [{ time: "09:00 AM", task: "⚽ Team Training Turf (DeRo)", cat: "dero" }]
+                    6: [
+                        { time: "09:00 AM", task: "⚽ Team Training Turf (DeRo)", cat: "dero", type: "practice" }
+                    ]
                 }
             },
             3: { 
                 days: {
-                    0: [{ time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden" }],
-                    1: [{ time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden" }, { time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
-                    2: [{ time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden" }, { time: "07:00 PM", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero" }],
-                    3: [{ time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden" }, { time: "06:00 PM", task: "🥍 Lacrosse Match", cat: "caden" }],
-                    4: [{ time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden" }, { time: "06:45 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
+                    // Week 3: July 13 - July 19, 2026
+                    0: [
+                        { time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden", type: "personal" }
+                    ],
+                    1: [
+                        { time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden", type: "personal" },
+                        { time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero", type: "practice" }
+                    ],
+                    2: [
+                        { time: "All Day", task: "💵 Monthly fee payment reminder", cat: "other", type: "other" },
+                        { time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden", type: "personal" },
+                        { time: "07:00 PM", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero", type: "game", opponent: "Hidden" }
+                    ],
+                    3: [
+                        { time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden", type: "personal" },
+                        { time: "06:00 PM", task: "🥍 Optional: Sister's Lacrosse", cat: "other", type: "personal" }
+                    ],
+                    4: [
+                        { time: "09:00 AM", task: "🏅 Caden Multisport Camp (McKinney)", cat: "caden", type: "personal" },
+                        { time: "06:45 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero", type: "practice" }
+                    ],
                     5: [],
-                    6: [{ time: "09:00 AM", task: "⚽ Team Training Turf (DeRo)", cat: "dero" }]
+                    6: [
+                        { time: "09:00 AM", task: "⚽ Team Training Turf (DeRo)", cat: "dero", type: "practice" }
+                    ]
                 }
             },
             4: { 
                 days: {
+                    // Week 4: July 20 - July 26, 2026
                     0: [],
-                    1: [{ time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
-                    2: [{ time: "07:00 PM", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero" }],
+                    1: [
+                        { time: "07:00 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero", type: "practice" }
+                    ],
+                    2: [
+                        { time: "07:00 PM", task: "⚽ GAME DAY - Opponent Hidden", cat: "dero", type: "game", opponent: "Hidden" }
+                    ],
                     3: [],
-                    4: [{ time: "06:45 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero" }],
+                    4: [
+                        { time: "06:45 PM", task: "⚽ Outdoor Team Training - Turf (DeRo)", cat: "dero", type: "practice" }
+                    ],
                     5: [],
-                    6: [{ time: "09:00 AM", task: "⚽ Team Training Turf (DeRo)", cat: "dero" }]
+                    6: [
+                        { time: "09:00 AM", task: "⚽ Team Training Turf (DeRo) — confirm", cat: "dero", type: "practice" }
+                    ]
                 }
             }
         };
@@ -1109,6 +1180,7 @@
                 loadAgreementProgress();
                 setHideOpponentsToggleFromStorage();
                 updateLateStartUI();
+                ensureCalendarDefaultVersion();
                 renderCalendarEditor();
             };
 
@@ -1131,6 +1203,17 @@
         function setHideOpponentsToggleFromStorage() {
             const toggle = document.getElementById('hide-opponents-toggle');
             if (toggle) toggle.checked = getHideOpponentsSetting();
+        }
+
+        function ensureCalendarDefaultVersion() {
+            const currentVersion = localStorage.getItem('schedule_default_version');
+            if (currentVersion !== DEFAULT_CALENDAR_VERSION) {
+                // New official calendar default from your uploaded July screenshots.
+                // This clears old saved test schedules so the updated default appears right away.
+                localStorage.removeItem('custom_calendar_schedule');
+                localStorage.setItem('schedule_default_version', DEFAULT_CALENDAR_VERSION);
+                calendarDraftSchedule = null;
+            }
         }
 
         function cloneDefaultCalendarSchedule() {
@@ -1362,6 +1445,9 @@
                 btn.className = "tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all";
             });
             document.getElementById(`btn-${tabId}`).className = "tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm whitespace-nowrap bg-indigo-600 text-white transition-all shadow-md";
+            if (tabId === 'calendar') {
+                renderRoutineTimeEditor();
+            }
         }
 
         // Selected active calendar week handler
@@ -1466,6 +1552,95 @@
             renderWeekRegimen();
         }
 
+
+        // Editable routine times. This fixes the exact-time problem without requiring a calendar screenshot.
+        const ROUTINE_TIME_DEFAULTS = {
+            wake: '07:00 AM',
+            walkam: '07:05 AM',
+            room: '07:20 AM',
+            mobility: '07:35 AM',
+            scan: '07:45 AM',
+            lunch: '12:00 PM',
+            snack: '03:30 PM',
+            feedpm: '05:00 PM',
+            walkpm: '05:05 PM',
+            litter: '05:10 PM',
+            strength: '05:15 PM',
+            weekly: '05:30 PM',
+            weekly2: '05:35 PM',
+            vacuum: '10:45 AM',
+            washrooms: '11:00 AM',
+            dinner: '06:15 PM',
+            milk4: '08:30 PM'
+        };
+
+        const ROUTINE_TIME_LABELS = [
+            ['wake', 'Breakfast + morning Rio food'],
+            ['walkam', 'Morning Rio walk'],
+            ['room', 'Clean room'],
+            ['mobility', 'Mobility/core'],
+            ['scan', 'Visual scanning'],
+            ['lunch', 'Lunch'],
+            ['snack', 'Calorie booster snack'],
+            ['feedpm', 'Evening Rio food'],
+            ['walkpm', 'Evening Rio walk'],
+            ['litter', 'Oscar litter bin'],
+            ['strength', 'Strength circuit'],
+            ['weekly', 'Weekly jobs start'],
+            ['weekly2', 'Second weekly job'],
+            ['vacuum', 'Saturday vacuum'],
+            ['washrooms', 'Sunday washrooms'],
+            ['dinner', 'Dinner/recovery meal'],
+            ['milk4', 'Protein fueling']
+        ];
+
+        function getRoutineTimeSettings() {
+            try {
+                const raw = localStorage.getItem('routine_time_settings');
+                return raw ? { ...ROUTINE_TIME_DEFAULTS, ...JSON.parse(raw) } : { ...ROUTINE_TIME_DEFAULTS };
+            } catch (err) {
+                console.warn('Could not read routine time settings:', err);
+                return { ...ROUTINE_TIME_DEFAULTS };
+            }
+        }
+
+        function rt(key) {
+            return getRoutineTimeSettings()[key] || ROUTINE_TIME_DEFAULTS[key] || 'TBD';
+        }
+
+        function renderRoutineTimeEditor() {
+            const mount = document.getElementById('routine-time-editor');
+            if (!mount) return;
+            const settings = getRoutineTimeSettings();
+            mount.innerHTML = ROUTINE_TIME_LABELS.map(([key, label]) => `
+                <label class="block rounded-xl border border-slate-800 bg-slate-950/60 p-2">
+                    <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">${label}</span>
+                    <input data-routine-time-key="${key}" value="${escapeHtml(settings[key] || '')}" class="w-full rounded-lg bg-slate-900/80 border border-slate-800 text-slate-100 text-xs px-3 py-2 focus:outline-none focus:border-emerald-500" placeholder="Example: 07:00 AM">
+                </label>
+            `).join('');
+        }
+
+        function saveRoutineTimeSettings() {
+            const settings = { ...ROUTINE_TIME_DEFAULTS };
+            document.querySelectorAll('[data-routine-time-key]').forEach(input => {
+                settings[input.dataset.routineTimeKey] = input.value.trim() || ROUTINE_TIME_DEFAULTS[input.dataset.routineTimeKey];
+            });
+            localStorage.setItem('routine_time_settings', JSON.stringify(settings));
+            const status = document.getElementById('routine-time-status');
+            if (status) status.textContent = 'Saved! Your routine times will sync across devices.';
+            renderDailyChecklist();
+            scheduleCloudSave();
+        }
+
+        function resetRoutineTimeSettings() {
+            localStorage.removeItem('routine_time_settings');
+            renderRoutineTimeEditor();
+            renderDailyChecklist();
+            scheduleCloudSave();
+            const status = document.getElementById('routine-time-status');
+            if (status) status.textContent = 'Times reset to default.';
+        }
+
         function renderDailyChecklist() {
             const checklistMount = document.getElementById('checklist-mount');
             checklistMount.innerHTML = '';
@@ -1479,11 +1654,11 @@
             }
 
             const lateMode = isLateStartModeActive();
-            const morningTime = lateMode ? "ASAP" : "07:00 AM";
-            const walkTime = lateMode ? "ASAP + 5" : "07:05 AM";
-            const roomTime = lateMode ? "ASAP + 15" : "07:20 AM";
-            const mobilityTime = lateMode ? "Only if time" : "07:35 AM";
-            const scanTime = lateMode ? "Only if time" : "07:45 AM";
+            const morningTime = lateMode ? "ASAP" : rt('wake');
+            const walkTime = lateMode ? "ASAP + 5" : rt('walkam');
+            const roomTime = lateMode ? "ASAP + 15" : rt('room');
+            const mobilityTime = lateMode ? "Only if time" : rt('mobility');
+            const scanTime = lateMode ? "Only if time" : rt('scan');
 
             const timeline = [];
             if (lateMode) {
@@ -1511,7 +1686,7 @@
             });
 
             timeline.push(
-                { time: "12:00 PM", task: "🥪 Lunch + 2nd Glass of Milk", cat: "nutrition", id: `lunch_${currentWeekNum}_${currentDayIdx}` }
+                { time: rt('lunch'), task: "🥪 Lunch + 2nd Glass of Milk", cat: "nutrition", id: `lunch_${currentWeekNum}_${currentDayIdx}` }
             );
 
             activeCalendarEvents.forEach((evt, idx) => {
@@ -1526,31 +1701,31 @@
             });
 
             timeline.push(
-                { time: "03:30 PM", task: "🥜 Calorie Booster Snack (Peanut Butter + Fruit + 3rd Glass of Milk)", cat: "nutrition", id: `milk3_${currentWeekNum}_${currentDayIdx}` }
+                { time: rt('snack'), task: "🥜 Calorie Booster Snack (Peanut Butter + Fruit + 3rd Glass of Milk)", cat: "nutrition", id: `milk3_${currentWeekNum}_${currentDayIdx}` }
             );
 
             timeline.push(
-                { time: "05:00 PM", task: "🍖 Evening Chore: Feeding Rio", cat: "chore", id: `ledger-feedpm-${currentDayIdx}`, isChore: true },
-                { time: "05:05 PM", task: "🐕 Evening Chore: Walk Rio (PM Loop)", cat: "chore", id: `ledger-walkpm-${currentDayIdx}`, isChore: true },
-                { time: "05:10 PM", task: "🐱 Afternoon Chore: Oscar Litter Bin", cat: "chore", id: `ledger-litter-${currentDayIdx}`, isChore: true }
+                { time: rt('feedpm'), task: "🍖 Evening Chore: Feeding Rio", cat: "chore", id: `ledger-feedpm-${currentDayIdx}`, isChore: true },
+                { time: rt('walkpm'), task: "🐕 Evening Chore: Walk Rio (PM Loop)", cat: "chore", id: `ledger-walkpm-${currentDayIdx}`, isChore: true },
+                { time: rt('litter'), task: "🐱 Afternoon Chore: Oscar Litter Bin", cat: "chore", id: `ledger-litter-${currentDayIdx}`, isChore: true }
             );
 
             const weeklyJobsByDay = {
-                1: [{ time: "05:30 PM", task: "👕 Weekly Job: Fold Laundry", cat: "chore", id: "ledger-laundry", isChore: true }],
-                3: [{ time: "05:30 PM", task: "🗑️ Weekly Job: Garbage Thursday", cat: "chore", id: "ledger-garbage-thu", isChore: true }, { time: "05:35 PM", task: "🚚 Weekly Job: Garbage to Curb", cat: "chore", id: "ledger-garbage-curb", isChore: true }],
-                5: [{ time: "10:45 AM", task: "🔌 Weekly Job: Vacuum Upstairs", cat: "chore", id: "ledger-vacuum", isChore: true }],
-                6: [{ time: "11:00 AM", task: "🧽 Weekly Job: Cleaning Washrooms", cat: "chore", id: "ledger-washrooms", isChore: true }]
+                1: [{ time: rt('weekly'), task: "👕 Weekly Job: Fold Laundry", cat: "chore", id: "ledger-laundry", isChore: true }],
+                3: [{ time: rt('weekly'), task: "🗑️ Weekly Job: Garbage Thursday", cat: "chore", id: "ledger-garbage-thu", isChore: true }, { time: rt('weekly2'), task: "🚚 Weekly Job: Garbage to Curb", cat: "chore", id: "ledger-garbage-curb", isChore: true }],
+                5: [{ time: rt('vacuum'), task: "🔌 Weekly Job: Vacuum Upstairs", cat: "chore", id: "ledger-vacuum", isChore: true }],
+                6: [{ time: rt('washrooms'), task: "🧽 Weekly Job: Cleaning Washrooms", cat: "chore", id: "ledger-washrooms", isChore: true }]
             };
             (weeklyJobsByDay[currentDayIdx] || []).forEach(job => timeline.push(job));
 
-            timeline.push({ time: "06:15 PM", task: "🍽️ Dinner / Recovery Meal (move after game or practice if needed)", cat: "nutrition", id: `dinner_${currentWeekNum}_${currentDayIdx}` });
+            timeline.push({ time: rt('dinner'), task: "🍽️ Dinner / Recovery Meal (move after game or practice if needed)", cat: "nutrition", id: `dinner_${currentWeekNum}_${currentDayIdx}` });
 
             const soccerDayKeys = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
             const soccerPlanText = SOCCER_WEEKS[currentWeekNum]?.[soccerDayKeys[currentDayIdx]] || 'Light ball touches, juggling, passing, or recovery.';
             const hasPracticeOrGame = activeCalendarEvents.some(e => (e.task || '').includes("Practice") || (e.task || '').includes("GAME") || (e.task || '').includes("Training"));
 
             if (currentDayIdx === 0 || currentDayIdx === 3 || currentDayIdx === 5) {
-                timeline.push({ time: "05:15 PM", task: "💪 Power-Builder Muscle Circuit (Pushups, Squats, Lunges, Planks)", cat: "fitness", id: `strength_${currentWeekNum}_${currentDayIdx}` });
+                timeline.push({ time: rt('strength'), task: "💪 Power-Builder Muscle Circuit (Pushups, Squats, Lunges, Planks)", cat: "fitness", id: `strength_${currentWeekNum}_${currentDayIdx}` });
             }
 
             if (!hasPracticeOrGame) {
@@ -1572,7 +1747,7 @@
             });
 
             timeline.push(
-                { time: "08:30 PM", task: "🥛 Protein Gain Fueling (PB Toast + 4th Glass of Milk)", cat: "nutrition", id: `milk4_${currentWeekNum}_${currentDayIdx}` }
+                { time: rt('milk4'), task: "🥛 Protein Gain Fueling (PB Toast + 4th Glass of Milk)", cat: "nutrition", id: `milk4_${currentWeekNum}_${currentDayIdx}` }
             );
 
             const timeRank = (time) => {
@@ -2052,7 +2227,9 @@
             'older_practice_monday_active',
             'custom_calendar_schedule',
             'hide_opponents_enabled',
-            'late_start_state'
+            'schedule_default_version',
+            'late_start_state',
+            'routine_time_settings'
         ];
 
         const app = initializeApp(firebaseConfig);
